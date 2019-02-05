@@ -125,6 +125,12 @@ namespace Toggl.Foundation.Interactors
 
         #endregion
 
+        #region UserAccess
+
+        IInteractor<IObservable<Unit>> Logout(LogoutSource source);
+
+        #endregion
+
         #region Settings
 
         IInteractor<IObservable<Unit>> SendFeedback(string message);

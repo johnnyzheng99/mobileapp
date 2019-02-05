@@ -66,6 +66,9 @@ namespace Toggl.Tests.UI
 
     public static class NewProject
     {
+        public const string ChangeClient = "ChangeClientButton";
         public const string CreateButton = "CreateProjectButton";
+        public const string ChangeWorkspace = "ChangeWorkspaceButton";
+        public const string TogglePrivateProject = "PrivateProjectSwitchContainer";
     }
 }

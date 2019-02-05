@@ -5,9 +5,11 @@ using MvvmCross.Platforms.Ios.Views;
 using Toggl.Daneel.Extensions;
 using Toggl.Daneel.Extensions.Reactive;
 using Toggl.Daneel.Presentation.Attributes;
+using Toggl.Daneel.Views.Settings;
 using Toggl.Daneel.ViewSources;
 using Toggl.Foundation;
 using Toggl.Foundation.MvvmCross.ViewModels;
+using Toggl.Foundation.MvvmCross.ViewModels.Selectable;
 using Toggl.Multivac.Extensions;
 
 namespace Toggl.Daneel.ViewControllers
@@ -17,6 +19,8 @@ namespace Toggl.Daneel.ViewControllers
         : MvxViewController<SelectDateFormatViewModel>,
           IDismissableViewController
     {
+        private const int rowHeight = 48;
+
         private readonly CompositeDisposable disposeBag = new CompositeDisposable();
 
         public SelectDateFormatViewController() : base(nameof(SelectDateFormatViewController), null)
@@ -29,11 +33,17 @@ namespace Toggl.Daneel.ViewControllers
 
             TitleLabel.Text = Resources.DateFormat;
 
-            var source = new DateFormatsTableViewSource(DateFormatsTableView, ViewModel.DateTimeFormats);
-            
+            DateFormatsTableView.RegisterNibForCellReuse(DateFormatViewCell.Nib, DateFormatViewCell.Identifier);
+            DateFormatsTableView.RowHeight = rowHeight;
+
+            var source = new ReloadTableViewSource<string, SelectableDateFormatViewModel>(
+                DateFormatViewCell.CellConfiguration(DateFormatViewCell.Identifier),
+                ViewModel.DateTimeFormats
+            );
+
             DateFormatsTableView.Source = source;
 
-            source.DateFormatSelected
+            source.Rx().ModelSelected()
                 .Subscribe(ViewModel.SelectDateFormat.Inputs)
                 .DisposedBy(disposeBag);
 

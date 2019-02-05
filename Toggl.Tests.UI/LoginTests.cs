@@ -4,6 +4,7 @@ using NUnit.Framework;
 using Xamarin.UITest;
 using Toggl.Tests.UI.Helpers;
 using static Toggl.Tests.UI.Extensions.LoginExtensions;
+using System.Linq;
 
 namespace Toggl.Tests.UI
 {
@@ -35,6 +36,19 @@ namespace Toggl.Tests.UI
             app.TryLoginAndFail();
 
             app.Screenshot("Login email page.");
+        }
+
+        [Test]
+        public void TheLoginButtonIsDisabledWhenEnteringMalformattedEmail()
+        {
+            var email = "asdasd@asdasd";
+            var password = "asdads";
+
+            app.Tap(Login.EmailText);
+            app.EnterText(email);
+            app.Tap(Login.PasswordText);
+            app.EnterText($"{password}123456");
+            app.CheckThatLoginButtonIsDisabled();
         }
 
         [Test]

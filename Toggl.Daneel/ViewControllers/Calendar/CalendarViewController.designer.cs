@@ -16,13 +16,22 @@ namespace Toggl.Daneel.ViewControllers
 		UIKit.UICollectionView CalendarCollectionView { get; set; }
 
 		[Outlet]
+		UIKit.UILabel CurrentDateLabel { get; set; }
+
+		[Outlet]
 		UIKit.UILabel DescriptionLabel { get; set; }
+
+		[Outlet]
+		UIKit.UIView ExtendedNavbarView { get; set; }
 
 		[Outlet]
 		UIKit.UIButton GetStartedButton { get; set; }
 
 		[Outlet]
 		UIKit.UIView OnboardingView { get; set; }
+
+		[Outlet]
+		UIKit.UILabel TimeTrackedTodayLabel { get; set; }
 
 		[Outlet]
 		UIKit.UILabel TitleLabel { get; set; }
@@ -32,6 +41,11 @@ namespace Toggl.Daneel.ViewControllers
 			if (CalendarCollectionView != null) {
 				CalendarCollectionView.Dispose ();
 				CalendarCollectionView = null;
+			}
+
+			if (DescriptionLabel != null) {
+				DescriptionLabel.Dispose ();
+				DescriptionLabel = null;
 			}
 
 			if (GetStartedButton != null) {
@@ -44,14 +58,24 @@ namespace Toggl.Daneel.ViewControllers
 				OnboardingView = null;
 			}
 
-			if (DescriptionLabel != null) {
-				DescriptionLabel.Dispose ();
-				DescriptionLabel = null;
-			}
-
 			if (TitleLabel != null) {
 				TitleLabel.Dispose ();
 				TitleLabel = null;
+			}
+
+			if (ExtendedNavbarView != null) {
+				ExtendedNavbarView.Dispose ();
+				ExtendedNavbarView = null;
+			}
+
+			if (TimeTrackedTodayLabel != null) {
+				TimeTrackedTodayLabel.Dispose ();
+				TimeTrackedTodayLabel = null;
+			}
+
+			if (CurrentDateLabel != null) {
+				CurrentDateLabel.Dispose ();
+				CurrentDateLabel = null;
 			}
 		}
 	}

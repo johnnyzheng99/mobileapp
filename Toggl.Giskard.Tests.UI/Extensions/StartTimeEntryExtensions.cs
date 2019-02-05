@@ -7,16 +7,32 @@ namespace Toggl.Tests.UI.Extensions
         public static void TapCreateTag(this IApp app, string tagName)
         {
             var query = $"Create tag \"{tagName}\"";
-            tapAndWaitForCreateElement(app, query);
+            tapAndWaitForElement(app, query);
         }
 
         public static void TapCreateProject(this IApp app, string projectName)
         {
             var query = $"Create project \"{projectName}\"";
-            tapAndWaitForCreateElement(app, query);
+            tapAndWaitForElement(app, query);
         }
 
-        private static void tapAndWaitForCreateElement(IApp app, string query)
+        public static void TapSelectTag(this IApp app, string tagName)
+        {
+            tapAndWaitForElement(app, tagName);
+        }
+
+        public static void TapSelectProject(this IApp app, string projectName)
+        {
+            tapAndWaitForElement(app, projectName);
+        }
+
+        public static void TapCreateClient(this IApp app, string clientName)
+        {
+            var query = $"Create client \"{clientName}\"";
+            tapAndWaitForElement(app, query);
+        }
+
+        private static void tapAndWaitForElement(IApp app, string query)
         {
             app.WaitForElement(query);
             app.Tap(query);

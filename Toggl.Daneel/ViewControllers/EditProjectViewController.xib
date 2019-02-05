@@ -136,6 +136,7 @@
                 </view>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Toggl Workspace" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rQX-az-AjC">
                     <rect key="frame" x="16" y="121" width="359" height="48"/>
+                    <accessibility key="accessibilityConfiguration" label="ChangeWorkspaceButton"/>
                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
@@ -149,6 +150,7 @@
                 </view>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No client" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vLP-Wm-fD5">
                     <rect key="frame" x="16" y="169" width="359" height="48"/>
+                    <accessibility key="accessibilityConfiguration" label="ChangeClientButton"/>
                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
@@ -177,6 +179,7 @@
                         </switch>
                     </subviews>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <accessibility key="accessibilityConfiguration" label="PrivateProjectSwitchContainer"/>
                     <constraints>
                         <constraint firstItem="wwu-Nj-fWo" firstAttribute="centerY" secondItem="nGK-A1-PiV" secondAttribute="centerY" id="KSZ-KU-awB"/>
                         <constraint firstItem="M40-dD-Egi" firstAttribute="centerY" secondItem="nGK-A1-PiV" secondAttribute="centerY" id="S3c-Hm-vox"/>

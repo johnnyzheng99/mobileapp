@@ -1,10 +1,14 @@
-﻿using MvvmCross.Platforms.Ios.Presenters.Attributes;
+﻿using System;
+using MvvmCross;
+using MvvmCross.Platforms.Ios.Presenters.Attributes;
 using MvvmCross.Plugin.Color.Platforms.Ios;
+using Toggl.Daneel.Extensions;
+using Toggl.Daneel.Extensions.Reactive;
 using Toggl.Daneel.ViewSources;
-using Toggl.Foundation.MvvmCross.Helper;
-using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Foundation.MvvmCross.ViewModels.Settings;
+using Toggl.Multivac;
 using Toggl.Multivac.Extensions;
+using Color = Toggl.Foundation.MvvmCross.Helper.Color;
 using FoundationResources = Toggl.Foundation.Resources;
 
 namespace Toggl.Daneel.ViewControllers.Settings
@@ -14,8 +18,11 @@ namespace Toggl.Daneel.ViewControllers.Settings
     {
         private const int tableViewHeaderHeight = 106;
 
+        private readonly ISchedulerProvider schedulerProvider;
+
         public CalendarSettingsViewController() : base(nameof(CalendarSettingsViewController))
         {
+            schedulerProvider = Mvx.Resolve<ISchedulerProvider>();
         }
 
         public override void ViewDidLoad()
@@ -31,15 +38,19 @@ namespace Toggl.Daneel.ViewControllers.Settings
             header.WidthAnchor.ConstraintEqualTo(UserCalendarsTableView.WidthAnchor).Active = true;
             header.SetCalendarPermissionStatus(ViewModel.PermissionGranted);
 
-            var source = new SelectUserCalendarsTableViewSource(UserCalendarsTableView, ViewModel.Calendars);
+            var source = new SelectUserCalendarsTableViewSource(UserCalendarsTableView);
             source.SectionHeaderBackgroundColor = Color.Settings.Background.ToNativeColor();
             UserCalendarsTableView.Source = source;
+
+            ViewModel.Calendars
+                .Subscribe(UserCalendarsTableView.Rx().Sections(source))
+                .DisposedBy(DisposeBag);
 
             header.EnableCalendarAccessTapped
                 .Subscribe(ViewModel.RequestAccess.Inputs)
                 .DisposedBy(DisposeBag);
 
-            source.ItemSelected
+            source.Rx().ModelSelected()
                 .Subscribe(ViewModel.SelectCalendar.Inputs)
                 .DisposedBy(DisposeBag);
         }

@@ -22,7 +22,7 @@ namespace Toggl.Daneel.ViewControllers
             base.ViewDidLoad();
 
             TitleLabel.Text = Resources.Startdate;
-            CloseButton.SetTitle(Resources.Save, UIControlState.Normal);
+            SaveButton.SetTitle(Resources.Save, UIControlState.Normal);
 
             prepareDatePicker();
 

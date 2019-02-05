@@ -35,14 +35,11 @@ namespace Toggl.Daneel.ViewSources
 
         public bool IsEmptyState { get; set; }
 
-        public IObservable<TimeEntryViewModel> ContinueTap
-            => continueTapSubject.AsObservable();
+        public IObservable<TimeEntryViewModel> ContinueTap { get; }
 
-        public IObservable<TimeEntryViewModel> SwipeToContinue
-            => swipeToContinueSubject.AsObservable();
+        public IObservable<TimeEntryViewModel> SwipeToContinue { get; }
 
-        public IObservable<TimeEntryViewModel> SwipeToDelete
-            => swipeToDeleteSubject.AsObservable();
+        public IObservable<TimeEntryViewModel> SwipeToDelete { get; }
 
         public IObservable<TimeEntriesLogViewCell> FirstCell { get; }
 
@@ -68,6 +65,9 @@ namespace Toggl.Daneel.ViewSources
                 deleteTableViewRowAction.BackgroundColor = Foundation.MvvmCross.Helper.Color.TimeEntriesLog.DeleteSwipeActionBackground.ToNativeColor();
             }
 
+            ContinueTap = continueTapSubject.AsDriver(schedulerProvider);
+            SwipeToContinue = swipeToContinueSubject.AsDriver(schedulerProvider);
+            SwipeToDelete = swipeToDeleteSubject.AsDriver(schedulerProvider);
             FirstCell = firstCellSubject.AsDriver(schedulerProvider);
         }
 

@@ -6,6 +6,7 @@ namespace Toggl.Daneel.Cells.Calendar
 {
     public sealed partial class UserCalendarListHeaderViewCell : BaseTableHeaderFooterView<string>
     {
+        public static readonly string Identifier = nameof(UserCalendarListHeaderViewCell);
         public static readonly NSString Key = new NSString(nameof(UserCalendarListHeaderViewCell));
         public static readonly UINib Nib;
 

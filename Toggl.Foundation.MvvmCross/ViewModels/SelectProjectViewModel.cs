@@ -91,8 +91,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         public IMvxAsyncCommand<AutocompleteSuggestion> SelectProjectCommand { get; }
 
-        public NestableObservableCollection<WorkspaceGroupedCollection<AutocompleteSuggestion>, AutocompleteSuggestion> Suggestions { get; }
-            = new NestableObservableCollection<WorkspaceGroupedCollection<AutocompleteSuggestion>, AutocompleteSuggestion>();
+        public MvxObservableCollection<WorkspaceGroupedCollection<AutocompleteSuggestion>> Suggestions { get; }
+            = new MvxObservableCollection<WorkspaceGroupedCollection<AutocompleteSuggestion>>();
 
         public SelectProjectViewModel(
             ITogglDataSource dataSource,
@@ -310,8 +310,13 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                 yield return suggestion;
 
                 if (suggestion is ProjectSuggestion projectSuggestion && projectSuggestion.TasksVisible)
-                    foreach (var taskSuggestion in projectSuggestion.Tasks)
+                {
+                    var orderedTasks = projectSuggestion.Tasks
+                        .OrderBy(t => t.Name);
+
+                    foreach (var taskSuggestion in orderedTasks)
                         yield return taskSuggestion;
+                }
             }
         }
     }

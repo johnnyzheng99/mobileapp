@@ -1,12 +1,14 @@
 ﻿using System;
+using Foundation;
+using Toggl.Daneel.ViewSources;
 using UIKit;
 
 namespace Toggl.Daneel.Cells
 {
-    public abstract class BaseTableViewCell<T> : UITableViewCell
+    public abstract class BaseTableViewCell<TModel> : UITableViewCell
     {
-        private T item;
-        public T Item
+        private TModel item;
+        public TModel Item
         {
             get => item;
             set
@@ -26,5 +28,15 @@ namespace Toggl.Daneel.Cells
         }
 
         protected abstract void UpdateView();
+
+        public static CellConfiguration<TModel> CellConfiguration(string cellIdentifier)
+        {
+            return (tableView, indexPath, model) =>
+            {
+                var cell = (BaseTableViewCell<TModel>)tableView.DequeueReusableCell(cellIdentifier, indexPath);
+                cell.Item = model;
+                return cell;
+            };
+        }
     }
 }

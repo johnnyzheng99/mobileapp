@@ -10,6 +10,8 @@ namespace Toggl.Foundation.Login
         IObservable<ITogglDataSource> UserLoggedIn { get; }
         IObservable<Unit> UserLoggedOut { get; }
 
+        void OnUserLoggedOut();
+
         ITogglDataSource GetDataSourceIfLoggedIn();
 
         IObservable<ITogglDataSource> LoginWithGoogle();
@@ -17,8 +19,6 @@ namespace Toggl.Foundation.Login
 
         IObservable<ITogglDataSource> SignUpWithGoogle(bool termsAccepted, int countryId);
         IObservable<ITogglDataSource> SignUp(Email email, Password password, bool termsAccepted, int countryId);
-
-        IObservable<Unit> Logout();
 
         IObservable<ITogglDataSource> RefreshToken(Password password);
 

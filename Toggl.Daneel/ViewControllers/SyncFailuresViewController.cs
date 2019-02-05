@@ -1,4 +1,5 @@
-﻿using UIKit;
+﻿using System.Reactive;
+using UIKit;
 using MvvmCross.Platforms.Ios.Views;
 using MvvmCross.Platforms.Ios.Presenters.Attributes;
 using Toggl.Foundation.MvvmCross.ViewModels;
@@ -17,10 +18,11 @@ namespace Toggl.Daneel.ViewControllers
 
             TableView.RowHeight = UITableView.AutomaticDimension;
             TableView.RegisterNibForCellReuse(SyncFailureCell.Nib, SyncFailureCell.Identifier);
-            TableView.Source = new ListTableViewSource<SyncFailureItem, SyncFailureCell>(
-                ViewModel.SyncFailures,
-                SyncFailureCell.Identifier
+            var tableViewSource = new ReloadTableViewSource<Unit, SyncFailureItem>(
+                SyncFailureCell.CellConfiguration(SyncFailureCell.Identifier),
+                ViewModel.SyncFailures
             );
+            TableView.Source = tableViewSource;
         }
     }
 }

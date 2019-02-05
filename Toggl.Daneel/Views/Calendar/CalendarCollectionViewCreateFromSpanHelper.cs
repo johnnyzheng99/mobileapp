@@ -56,23 +56,24 @@ namespace Toggl.Daneel.Views.Calendar
         private void onLongPress(UILongPressGestureRecognizer gesture)
         {
             var point = gesture.LocationInView(CollectionView);
+            var isEditing = dataSource.IsEditing && itemIndexPath != null;
 
             switch (gesture.State)
             {
-                case UIGestureRecognizerState.Began:
+                case UIGestureRecognizerState.Began when !dataSource.IsEditing && dataSource.CalendarItemAtPoint(point) == null:
                     longPressBegan(point);
                     break;
 
-                case UIGestureRecognizerState.Changed:
+                case UIGestureRecognizerState.Changed when isEditing:
                     longPressChanged(point);
                     break;
 
-                case UIGestureRecognizerState.Ended:
+                case UIGestureRecognizerState.Ended when isEditing:
                     longPressEnded(point);
                     break;
 
-                case UIGestureRecognizerState.Cancelled:
-                case UIGestureRecognizerState.Failed:
+                case UIGestureRecognizerState.Cancelled when isEditing:
+                case UIGestureRecognizerState.Failed when isEditing:
                     dataSource.RemoveItemView(itemIndexPath);
                     dataSource.StopEditing();
                     itemIndexPath = null;
@@ -82,9 +83,6 @@ namespace Toggl.Daneel.Views.Calendar
 
         private void longPressBegan(CGPoint point)
         {
-            if (dataSource.IsEditing || dataSource.CalendarItemAtPoint(point) != null)
-                return;
-
             allItemsStartAndEndTime = dataSource.AllItemsStartAndEndTime();
 
             dataSource.StartEditing();
@@ -100,9 +98,6 @@ namespace Toggl.Daneel.Views.Calendar
 
         private void longPressChanged(CGPoint point)
         {
-            if (itemIndexPath == null)
-                return;
-
             LastPoint = point;
 
             DateTimeOffset startTime;
@@ -137,9 +132,6 @@ namespace Toggl.Daneel.Views.Calendar
 
         private void longPressEnded(CGPoint point)
         {
-            if (itemIndexPath == null)
-                return;
-
             LastPoint = point;
 
             DateTimeOffset startTime;

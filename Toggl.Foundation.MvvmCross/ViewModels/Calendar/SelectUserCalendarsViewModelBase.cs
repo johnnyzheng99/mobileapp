@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using MvvmCross.ViewModels;
@@ -19,22 +19,14 @@ namespace Toggl.Foundation.MvvmCross.ViewModels.Calendar
     public abstract class SelectUserCalendarsViewModelBase : MvxViewModel<bool, string[]>
     {
         private readonly IUserPreferences userPreferences;
-        private readonly IRxActionFactory rxActionFactory;
+
+        public IObservable<IImmutableList<CollectionSection<string, SelectableUserCalendarViewModel>>> Calendars { get; }
+
+        public InputAction<SelectableUserCalendarViewModel> SelectCalendar { get; }
 
         protected bool ForceItemSelection { get; private set; }
 
-        protected IInteractorFactory InteractorFactory { get; }
-
         protected HashSet<string> SelectedCalendarIds { get; } = new HashSet<string>();
-
-        public ObservableGroupedOrderedCollection<SelectableUserCalendarViewModel> Calendars { get; }
-            = new ObservableGroupedOrderedCollection<SelectableUserCalendarViewModel>(
-                indexKey: c => c.Id,
-                orderingKey: c => c.Name,
-                groupingKey: c => c.SourceName
-            );
-
-        public InputAction<SelectableUserCalendarViewModel> SelectCalendar { get; }
 
         protected SelectUserCalendarsViewModelBase(
             IUserPreferences userPreferences,
@@ -46,13 +38,17 @@ namespace Toggl.Foundation.MvvmCross.ViewModels.Calendar
             Ensure.Argument.IsNotNull(rxActionFactory, nameof(rxActionFactory));
 
             this.userPreferences = userPreferences;
-            InteractorFactory = interactorFactory;
-            this.rxActionFactory = rxActionFactory;
 
-            SelectCalendar = rxActionFactory.FromObservable<SelectableUserCalendarViewModel>(selectCalendar);
+            SelectCalendar = rxActionFactory.FromAction<SelectableUserCalendarViewModel>(toggleCalendarSelection);
+
+            Calendars = interactorFactory
+                .GetUserCalendars()
+                .Execute()
+                .Catch((NotAuthorizedException _) => Observable.Return(new List<UserCalendar>()))
+                .Select(group);
         }
 
-        public override sealed void Prepare(bool parameter)
+        public sealed override void Prepare(bool parameter)
         {
             ForceItemSelection = parameter;
         }
@@ -62,28 +58,29 @@ namespace Toggl.Foundation.MvvmCross.ViewModels.Calendar
             await base.Initialize();
 
             SelectedCalendarIds.AddRange(userPreferences.EnabledCalendarIds());
-
-            await InteractorFactory
-                .GetUserCalendars()
-                .Execute()
-                .Catch((NotAuthorizedException _) => Observable.Return(new List<UserCalendar>()))
-                .Select(calendars => calendars.Select(toSelectable))
-                .Do(calendars => calendars.ForEach(calendar => Calendars.InsertItem(calendar)));
         }
+
+        private IImmutableList<CollectionSection<string, SelectableUserCalendarViewModel>> group(IEnumerable<UserCalendar> calendars)
+            => calendars
+                .Select(toSelectable)
+                .GroupBy(calendar => calendar.SourceName)
+                .Select(group =>
+                    new CollectionSection<string, SelectableUserCalendarViewModel>(
+                        group.First().SourceName,
+                        group.OrderBy(calendar => calendar.Name)
+                    )
+                )
+                .ToImmutableList();
 
         private SelectableUserCalendarViewModel toSelectable(UserCalendar calendar)
             => new SelectableUserCalendarViewModel(calendar, SelectedCalendarIds.Contains(calendar.Id));
 
-        private IObservable<Unit> selectCalendar(SelectableUserCalendarViewModel calendar)
+        private void toggleCalendarSelection(SelectableUserCalendarViewModel calendar)
         {
             if (SelectedCalendarIds.Contains(calendar.Id))
                 SelectedCalendarIds.Remove(calendar.Id);
             else
                 SelectedCalendarIds.Add(calendar.Id);
-
-            calendar.Selected = !calendar.Selected;
-
-            return Observable.Return(Unit.Default);
         }
     }
 }

@@ -34,7 +34,7 @@ namespace Toggl.Foundation
         {
             var queue = new SyncStateQueue();
             var entryPoints = new StateMachineEntryPoints();
-            var transitions = new TransitionHandlerProvider();
+            var transitions = new TransitionHandlerProvider(analyticsService);
             ConfigureTransitions(transitions, database, api, dataSource, scheduler, timeService, analyticsService, entryPoints, queue);
             var stateMachine = new StateMachine(transitions, scheduler);
             var orchestrator = new StateMachineOrchestrator(stateMachine, entryPoints);

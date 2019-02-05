@@ -25,6 +25,7 @@ using Toggl.Foundation.Services;
 using Toggl.Multivac;
 using Toggl.Multivac.Extensions;
 using Toggl.PrimeRadiant.Settings;
+using Toggl.Foundation.MvvmCross.Transformations;
 
 [assembly: MvxNavigation(typeof(CalendarViewModel), ApplicationUrls.Calendar.Regex)]
 namespace Toggl.Foundation.MvvmCross.ViewModels.Calendar
@@ -53,6 +54,10 @@ namespace Toggl.Foundation.MvvmCross.ViewModels.Calendar
         public IObservable<bool> ShouldShowOnboarding { get; }
 
         public IObservable<TimeFormat> TimeOfDayFormat { get; }
+
+        public IObservable<string> TimeTrackedToday { get; }
+
+        public IObservable<string> CurrentDate { get; }
 
         public UIAction GetStarted { get; }
 
@@ -119,10 +124,26 @@ namespace Toggl.Foundation.MvvmCross.ViewModels.Calendar
 
             ShouldShowOnboarding = onboardingObservable.AsDriver(false, schedulerProvider);
 
-            TimeOfDayFormat = dataSource
-                .Preferences
-                .Current
-                .Select(preferences => preferences.TimeOfDayFormat);
+            var preferences = dataSource.Preferences.Current;
+
+            TimeOfDayFormat = preferences
+                .Select(current => current.TimeOfDayFormat)
+                .AsDriver(schedulerProvider);
+
+            var durationFormat = preferences.Select(current => current.DurationFormat);
+            var dateFormat = preferences.Select(current => current.DateFormat);
+            var timeTrackedToday = interactorFactory.ObserveTimeTrackedToday().Execute();
+
+            TimeTrackedToday = timeTrackedToday
+                .StartWith(TimeSpan.Zero)
+                .CombineLatest(durationFormat, DurationAndFormatToString.Convert)
+                .AsDriver(schedulerProvider);
+
+            CurrentDate = timeService.CurrentDateTimeObservable
+                .Select(dateTime => dateTime.ToLocalTime().Date)
+                .DistinctUntilChanged()
+                .CombineLatest(dateFormat, (date, format) => DateTimeToFormattedString.Convert(date, format.Long))
+                .AsDriver(schedulerProvider);
 
             GetStarted = rxActionFactory.FromAsync(getStarted);
             OnItemTapped = rxActionFactory.FromAsync<CalendarItem>(handleCalendarItem);

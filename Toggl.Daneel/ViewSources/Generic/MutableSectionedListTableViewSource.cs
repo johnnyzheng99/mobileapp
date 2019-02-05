@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using Foundation;
 using Toggl.Daneel.Cells;
 using Toggl.Foundation.MvvmCross.Collections;
@@ -9,38 +11,36 @@ using UIKit;
 
 namespace Toggl.Daneel.ViewSources
 {
-    public class SectionedListTableViewSource<TModel, TCell> : UITableViewSource
+    public class MutableSectionedListTableViewSource<TModel, TCell> : UITableViewSource
         where TCell : BaseTableViewCell<TModel>
     {
+        private readonly ISubject<TModel> itemSelectedSubject = new Subject<TModel>();
         private readonly string cellIdentifier;
 
         private readonly IReadOnlyList<IReadOnlyList<TModel>> items;
 
-        public Action<TModel> OnItemTapped { get; set; }
+        public IObservable<TModel> ItemSelected { get; }
 
         protected IReadOnlyList<IReadOnlyList<TModel>> DisplayedItems
             => displayedItems.Select(section => section.AsReadOnly()).ToList().AsReadOnly();
 
         private List<List<TModel>> displayedItems;
 
-        public SectionedListTableViewSource(IReadOnlyList<IReadOnlyList<TModel>> items, string cellIdentifier)
+        public MutableSectionedListTableViewSource(IReadOnlyList<IReadOnlyList<TModel>> items, string cellIdentifier)
         {
             this.items = items;
             this.cellIdentifier = cellIdentifier;
+
+            ItemSelected = itemSelectedSubject.AsObservable();
 
             reloadDisplayedData();
         }
 
         public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
         {
-            var cell = tableView.DequeueReusableCell(cellIdentifier, indexPath) as BaseTableViewCell<TModel>;
+            var cell = (TCell)tableView.DequeueReusableCell(cellIdentifier, indexPath);
             cell.Item = displayedItems[indexPath.Section][indexPath.Row];
             return cell;
-        }
-
-        public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
-        {
-            OnItemTapped?.Invoke(displayedItems[indexPath.Section][indexPath.Row]);
         }
 
         public override nint NumberOfSections(UITableView tableView)
@@ -49,8 +49,11 @@ namespace Toggl.Daneel.ViewSources
         public override nint RowsInSection(UITableView tableview, nint section)
             => displayedItems[(int)section].Count;
 
-        public bool HasSection(int section)
-            => displayedItems.Count > section;
+        public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
+        {
+            var item = DisplayedItems[indexPath.Section][indexPath.Row];
+            itemSelectedSubject.OnNext(item);
+        }
 
         public void ChangeDisplayedCollection(ICollectionChange change)
         {

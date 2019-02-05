@@ -10,16 +10,16 @@ namespace Toggl.Foundation.MvvmCross.ViewModels.Selectable
 
         public string SourceName { get; }
 
-        public bool Selected { get; set; }
+        public bool InitiallySelected { get; }
 
-        public SelectableUserCalendarViewModel(UserCalendar calendar, bool selected)
+        public SelectableUserCalendarViewModel(UserCalendar calendar, bool initiallySelected)
         {
             Ensure.Argument.IsNotNull(calendar, nameof(calendar));
 
             Id = calendar.Id;
             Name = calendar.Name;
             SourceName = calendar.SourceName;
-            Selected = selected;
+            InitiallySelected = initiallySelected;
         }
     }
 }

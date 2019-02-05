@@ -16,13 +16,7 @@ namespace Toggl.Daneel.Views
 		UIKit.UILabel AddDescriptionLabel { get; set; }
 
 		[Outlet]
-		UIKit.NSLayoutConstraint AddDescriptionTopDistanceConstraint { get; set; }
-
-		[Outlet]
-		UIKit.UIImageView BillableImageView { get; set; }
-
-		[Outlet]
-		UIKit.NSLayoutConstraint BillableImageViewSpacingConstraint { get; set; }
+		UIKit.UIView BillableIcon { get; set; }
 
 		[Outlet]
 		[GeneratedCode ("iOS Designer", "1.0")]
@@ -38,14 +32,16 @@ namespace Toggl.Daneel.Views
 
 		[Outlet]
 		[GeneratedCode ("iOS Designer", "1.0")]
-		UIKit.NSLayoutConstraint DescriptionTopDistanceConstraint { get; set; }
-
-		[Outlet]
-		[GeneratedCode ("iOS Designer", "1.0")]
 		Toggl.Daneel.Views.FadeView FadeView { get; set; }
 
 		[Outlet]
-		UIKit.NSLayoutConstraint FadeViewTrailingConstraint { get; set; }
+		UIKit.UIView GroupSizeBackground { get; set; }
+
+		[Outlet]
+		UIKit.UIView GroupSizeContainer { get; set; }
+
+		[Outlet]
+		UIKit.UILabel GroupSizeLabel { get; set; }
 
 		[Outlet]
 		[GeneratedCode ("iOS Designer", "1.0")]
@@ -56,7 +52,7 @@ namespace Toggl.Daneel.Views
 		UIKit.UIImageView SyncErrorImageView { get; set; }
 
 		[Outlet]
-		UIKit.UIImageView TagsImageView { get; set; }
+		UIKit.UIView TagIcon { get; set; }
 
 		[Outlet]
 		[GeneratedCode ("iOS Designer", "1.0")]
@@ -73,14 +69,9 @@ namespace Toggl.Daneel.Views
 				AddDescriptionLabel = null;
 			}
 
-			if (AddDescriptionTopDistanceConstraint != null) {
-				AddDescriptionTopDistanceConstraint.Dispose ();
-				AddDescriptionTopDistanceConstraint = null;
-			}
-
-			if (BillableImageView != null) {
-				BillableImageView.Dispose ();
-				BillableImageView = null;
+			if (BillableIcon != null) {
+				BillableIcon.Dispose ();
+				BillableIcon = null;
 			}
 
 			if (ContinueButton != null) {
@@ -98,19 +89,24 @@ namespace Toggl.Daneel.Views
 				DescriptionLabel = null;
 			}
 
-			if (DescriptionTopDistanceConstraint != null) {
-				DescriptionTopDistanceConstraint.Dispose ();
-				DescriptionTopDistanceConstraint = null;
-			}
-
 			if (FadeView != null) {
 				FadeView.Dispose ();
 				FadeView = null;
 			}
 
-			if (FadeViewTrailingConstraint != null) {
-				FadeViewTrailingConstraint.Dispose ();
-				FadeViewTrailingConstraint = null;
+			if (GroupSizeBackground != null) {
+				GroupSizeBackground.Dispose ();
+				GroupSizeBackground = null;
+			}
+
+			if (GroupSizeContainer != null) {
+				GroupSizeContainer.Dispose ();
+				GroupSizeContainer = null;
+			}
+
+			if (GroupSizeLabel != null) {
+				GroupSizeLabel.Dispose ();
+				GroupSizeLabel = null;
 			}
 
 			if (ProjectTaskClientLabel != null) {
@@ -123,9 +119,9 @@ namespace Toggl.Daneel.Views
 				SyncErrorImageView = null;
 			}
 
-			if (TagsImageView != null) {
-				TagsImageView.Dispose ();
-				TagsImageView = null;
+			if (TagIcon != null) {
+				TagIcon.Dispose ();
+				TagIcon = null;
 			}
 
 			if (TimeLabel != null) {
@@ -136,11 +132,6 @@ namespace Toggl.Daneel.Views
 			if (UnsyncedImageView != null) {
 				UnsyncedImageView.Dispose ();
 				UnsyncedImageView = null;
-			}
-
-			if (BillableImageViewSpacingConstraint != null) {
-				BillableImageViewSpacingConstraint.Dispose ();
-				BillableImageViewSpacingConstraint = null;
 			}
 		}
 	}

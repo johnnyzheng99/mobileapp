@@ -34,7 +34,7 @@
 	<key>CFBundleName</key>
 	<string>Toggl for Devs</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.15</string>
+	<string>1.16.1</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -53,19 +53,9 @@
 				<string>{TOGGL_REVERSED_CLIENT_ID}</string>
 			</array>
 		</dict>
-		<dict>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>fb{TOGGL_FACEBOOK_APP_ID}</string>
-			</array>
-		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>IOS_BUNDLE_VERSION</string>
-	<key>FacebookAppID</key>
-	<string>{TOGGL_FACEBOOK_APP_ID}</string>
-	<key>FacebookDisplayName</key>
-	<string>Toggl</string>
 	<key>NSCalendarsUsageDescription</key>
 	<string>Toggl needs access to your calendar in order to display its events</string>
 	<key>ITSAppUsesNonExemptEncryption</key>

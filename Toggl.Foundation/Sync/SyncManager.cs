@@ -119,6 +119,7 @@ namespace Toggl.Foundation.Sync
         {
             lock (stateLock)
             {
+                analyticsService.SyncCompleted.Track();
                 IsRunningSync = false;
 
                 if (result is Success)
@@ -143,6 +144,9 @@ namespace Toggl.Foundation.Sync
 
         private void processError(Exception error)
         {
+            analyticsService.TrackAnonymized(error);
+            analyticsService.SyncFailed.Track(error.GetType().FullName, error.Message, error.StackTrace);
+
             queue.Clear();
             orchestrator.Start(Sleep);
 
@@ -162,7 +166,6 @@ namespace Toggl.Foundation.Sync
             else
             {
                 progress.OnNext(SyncProgress.Failed);
-                analyticsService.TrackAnonymized(error);
             }
 
             if (error is ClientDeprecatedException
@@ -187,6 +190,8 @@ namespace Toggl.Foundation.Sync
             if (IsRunningSync) return;
 
             var state = isFrozen ? Sleep : queue.Dequeue();
+            analyticsService.SyncOperationStarted.Track(state.ToString());
+
             IsRunningSync = state != Sleep;
 
             if (IsRunningSync && progress.FirstAsync().Wait() != SyncProgress.Syncing)

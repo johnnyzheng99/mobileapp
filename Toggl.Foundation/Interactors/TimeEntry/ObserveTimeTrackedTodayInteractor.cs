@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -7,7 +8,6 @@ using Toggl.Foundation.Extensions;
 using Toggl.Foundation.Models.Interfaces;
 using Toggl.Multivac;
 using Toggl.Multivac.Extensions;
-using Toggl.PrimeRadiant.Models;
 
 namespace Toggl.Foundation.Interactors
 {
@@ -29,7 +29,8 @@ namespace Toggl.Foundation.Interactors
 
         public IObservable<TimeSpan> Execute()
             => whenUpdateIsNecessary()
-                .SelectMany(_ => calculateTimeTrackedToday())
+                .Select(_ => calculateTimeTrackedToday())
+                .Switch()
                 .DistinctUntilChanged();
 
         private IObservable<Unit> whenUpdateIsNecessary()
@@ -47,24 +48,23 @@ namespace Toggl.Foundation.Interactors
                     alreadyTrackedToday + currentlyRunningTimeEntryDuration);
 
         private IObservable<TimeSpan> calculateTimeAlreadyTrackedToday()
-            => timeEntries.GetAll(startedTodayAndStopped)
-                .SingleAsync()
+            => getAll(startedTodayAndStopped)
                 .Select(entries => entries.Sum(timeEntry => timeEntry.Duration ?? 0.0))
                 .Select(TimeSpan.FromSeconds);
 
         private IObservable<TimeSpan> observeElapsedTimeOfRunningTimeEntryIfAny()
-            => timeEntries.GetAll(startedTodayAndRunning)
+            => getAll(startedTodayAndRunning)
                 .Select(runningTimeEntries => runningTimeEntries.SingleOrDefault())
                 .SelectMany(timeEntry =>
                     timeEntry == null
                         ? Observable.Return(TimeSpan.Zero)
                         : observeElapsedTimeOfRunningTimeEntry(timeEntry));
 
-        private bool startedTodayAndStopped(IDatabaseTimeEntry timeEntry)
+        private bool startedTodayAndStopped(IThreadSafeTimeEntry timeEntry)
             => timeEntry.Start.LocalDateTime.Date == timeService.CurrentDateTime.LocalDateTime.Date
                && timeEntry.Duration != null;
 
-        private bool startedTodayAndRunning(IDatabaseTimeEntry timeEntry)
+        private bool startedTodayAndRunning(IThreadSafeTimeEntry timeEntry)
             => timeEntry.Start.LocalDateTime.Date == timeService.CurrentDateTime.LocalDateTime.Date
                 && timeEntry.Duration == null;
 
@@ -72,5 +72,11 @@ namespace Toggl.Foundation.Interactors
             => timeService.CurrentDateTimeObservable
                 .Select(now => now - timeEntry.Start)
                 .StartWith(timeService.CurrentDateTime - timeEntry.Start);
+
+        private IObservable<IEnumerable<IThreadSafeTimeEntry>> getAll(Func<IThreadSafeTimeEntry, bool> predicate)
+            => new GetAllTimeEntriesVisibleToTheUserInteractor(timeEntries)
+                .Execute()
+                .SingleAsync()
+                .Select(entries => entries.Where(predicate));
     }
 }

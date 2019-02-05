@@ -13,9 +13,12 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="CalendarViewController">
             <connections>
                 <outlet property="CalendarCollectionView" destination="NhI-Kn-KUq" id="MHb-E0-Sdr"/>
+                <outlet property="CurrentDateLabel" destination="xyD-rD-i58" id="K1n-Dy-Y0w"/>
                 <outlet property="DescriptionLabel" destination="VkW-m5-AZZ" id="7gw-57-8HY"/>
+                <outlet property="ExtendedNavbarView" destination="LXy-pR-2Vb" id="YsT-db-WCa"/>
                 <outlet property="GetStartedButton" destination="a5y-Zp-fr2" id="02r-oY-SLb"/>
                 <outlet property="OnboardingView" destination="4HD-Ed-Lag" id="5B3-LC-ez0"/>
+                <outlet property="TimeTrackedTodayLabel" destination="Nwq-D8-dC3" id="QyH-VP-TQP"/>
                 <outlet property="TitleLabel" destination="5js-B3-I4Q" id="pqh-a1-sGg"/>
                 <outlet property="view" destination="2" id="RRd-Eg-VrN"/>
             </connections>
@@ -25,8 +28,41 @@
             <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="LXy-pR-2Vb">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="31"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0:00:00" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Nwq-D8-dC3" userLabel="Time Tracked Today">
+                            <rect key="frame" x="312.5" y="8" width="46.5" height="15"/>
+                            <fontDescription key="fontDescription" type="system" weight="medium" pointSize="12"/>
+                            <color key="textColor" red="0.70980392156862748" green="0.73725490196078436" blue="0.75294117647058822" alpha="1" colorSpace="calibratedRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Today" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xyD-rD-i58" userLabel="Current Date">
+                            <rect key="frame" x="16" y="8" width="35" height="15"/>
+                            <fontDescription key="fontDescription" type="system" weight="medium" pointSize="12"/>
+                            <color key="textColor" red="0.70980392160000005" green="0.73725490199999999" blue="0.75294117650000003" alpha="1" colorSpace="calibratedRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstItem="Nwq-D8-dC3" firstAttribute="top" secondItem="LXy-pR-2Vb" secondAttribute="top" constant="8" id="6Qa-Sf-Le2"/>
+                        <constraint firstAttribute="bottom" secondItem="Nwq-D8-dC3" secondAttribute="bottom" constant="8" id="AKU-6h-fsz"/>
+                        <constraint firstItem="xyD-rD-i58" firstAttribute="top" secondItem="LXy-pR-2Vb" secondAttribute="top" constant="8" id="FxX-fd-ybh"/>
+                        <constraint firstAttribute="bottom" secondItem="xyD-rD-i58" secondAttribute="bottom" constant="8" id="KJl-yh-hCv"/>
+                        <constraint firstItem="xyD-rD-i58" firstAttribute="leading" secondItem="LXy-pR-2Vb" secondAttribute="leading" constant="16" id="LTq-Av-Vb4"/>
+                        <constraint firstAttribute="trailing" secondItem="Nwq-D8-dC3" secondAttribute="trailing" constant="16" id="Q2I-Ky-Yzf"/>
+                    </constraints>
+                </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3RA-hC-Bqf" userLabel="Top Separator">
+                    <rect key="frame" x="0.0" y="31" width="375" height="1"/>
+                    <color key="backgroundColor" red="0.90980392156862744" green="0.90980392156862744" blue="0.90980392156862744" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="1" id="PUD-Kx-nM1"/>
+                    </constraints>
+                </view>
                 <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="NhI-Kn-KUq">
-                    <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                    <rect key="frame" x="0.0" y="32" width="375" height="635"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="xJA-hD-XsC">
                         <size key="itemSize" width="50" height="50"/>
@@ -36,7 +72,7 @@
                     </collectionViewFlowLayout>
                 </collectionView>
                 <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4HD-Ed-Lag" userLabel="Onboarding View">
-                    <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                    <rect key="frame" x="0.0" y="32" width="375" height="635"/>
                     <subviews>
                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="icIllustrationCalendar" translatesAutoresizingMaskIntoConstraints="NO" id="CPI-0j-ChM">
                             <rect key="frame" x="142" y="145" width="91" height="69"/>
@@ -85,29 +121,26 @@
                         <constraint firstItem="a5y-Zp-fr2" firstAttribute="top" secondItem="VkW-m5-AZZ" secondAttribute="bottom" constant="24" id="slp-Ax-zgR"/>
                     </constraints>
                 </view>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3RA-hC-Bqf" userLabel="Top Separator">
-                    <rect key="frame" x="0.0" y="20" width="375" height="1"/>
-                    <color key="backgroundColor" red="0.90980392156862744" green="0.90980392156862744" blue="0.90980392156862744" alpha="1" colorSpace="calibratedRGB"/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="1" id="PUD-Kx-nM1"/>
-                    </constraints>
-                </view>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <constraints>
                 <constraint firstItem="NhI-Kn-KUq" firstAttribute="bottom" secondItem="Gmd-lW-ZGB" secondAttribute="bottom" id="4Vh-60-csU"/>
+                <constraint firstItem="LXy-pR-2Vb" firstAttribute="leading" secondItem="Gmd-lW-ZGB" secondAttribute="leading" id="5DQ-AG-RgN"/>
+                <constraint firstItem="3RA-hC-Bqf" firstAttribute="top" secondItem="LXy-pR-2Vb" secondAttribute="bottom" id="7jd-Qc-cxJ"/>
                 <constraint firstAttribute="bottom" secondItem="4HD-Ed-Lag" secondAttribute="bottom" id="7kd-gh-CMu"/>
                 <constraint firstAttribute="trailing" secondItem="4HD-Ed-Lag" secondAttribute="trailing" id="AKw-sA-S7u"/>
                 <constraint firstItem="NhI-Kn-KUq" firstAttribute="leading" secondItem="Gmd-lW-ZGB" secondAttribute="leading" id="BBh-t4-ydr"/>
-                <constraint firstItem="NhI-Kn-KUq" firstAttribute="top" secondItem="2" secondAttribute="top" id="PrH-nw-NVE"/>
-                <constraint firstItem="4HD-Ed-Lag" firstAttribute="top" secondItem="2" secondAttribute="top" id="PyK-SL-wQm"/>
+                <constraint firstItem="Gmd-lW-ZGB" firstAttribute="trailing" secondItem="LXy-pR-2Vb" secondAttribute="trailing" id="Rld-f6-Acg"/>
                 <constraint firstAttribute="trailing" secondItem="3RA-hC-Bqf" secondAttribute="trailing" id="gmv-li-nfu"/>
-                <constraint firstItem="3RA-hC-Bqf" firstAttribute="top" secondItem="Gmd-lW-ZGB" secondAttribute="top" id="iDN-oq-Xoi"/>
+                <constraint firstItem="NhI-Kn-KUq" firstAttribute="top" secondItem="3RA-hC-Bqf" secondAttribute="bottom" id="hEg-dN-eMJ"/>
+                <constraint firstItem="4HD-Ed-Lag" firstAttribute="top" secondItem="3RA-hC-Bqf" secondAttribute="bottom" id="jyI-vw-Zuz"/>
+                <constraint firstItem="LXy-pR-2Vb" firstAttribute="top" secondItem="2" secondAttribute="top" id="kLd-uU-jws"/>
                 <constraint firstItem="NhI-Kn-KUq" firstAttribute="trailing" secondItem="Gmd-lW-ZGB" secondAttribute="trailing" id="xyG-4v-H5P"/>
                 <constraint firstItem="3RA-hC-Bqf" firstAttribute="leading" secondItem="2" secondAttribute="leading" id="yGO-jS-eul"/>
                 <constraint firstItem="4HD-Ed-Lag" firstAttribute="leading" secondItem="2" secondAttribute="leading" id="yS4-uj-tTO"/>
             </constraints>
             <viewLayoutGuide key="safeArea" id="Gmd-lW-ZGB"/>
+            <point key="canvasLocation" x="132" y="154.27286356821591"/>
         </view>
     </objects>
     <resources>

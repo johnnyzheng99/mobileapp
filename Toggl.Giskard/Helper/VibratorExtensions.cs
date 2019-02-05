@@ -1,22 +1,19 @@
-﻿using System;
-using Android.Media;
-using Android.OS;
+﻿using Android.OS;
 
 namespace Toggl.Giskard.Helper
 {
     internal static class VibratorExtensions
     {
-        public static void ActivateVibration(this Vibrator vibrator, int duration)
+        public static void ActivateVibration(this Vibrator vibrator, int duration, int amplitude)
         {
-            if (!vibrator.HasVibrator)
+            // We can't control the amplitude/intensity of the vibration before Oreo
+            // It might give a bad experience on lower end phones
+            if (!vibrator.HasVibrator || !OreoApis.AreAvailable)
                 return;
 
             try
             {
-                if (OreoApis.AreAvailable)
-                    vibrator.Vibrate(VibrationEffect.CreateOneShot(duration, 10));
-                else
-                    vibrator.Vibrate(duration);
+                vibrator.Vibrate(VibrationEffect.CreateOneShot(duration, amplitude));
             }
             catch
             {

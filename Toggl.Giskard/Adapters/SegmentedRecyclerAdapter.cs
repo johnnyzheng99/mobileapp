@@ -24,31 +24,9 @@ namespace Toggl.Giskard.Adapters
 
         private int? cachedItemCount;
 
-        protected NestableObservableCollection<TCollection, TItem> AnimatableCollection
-            => ItemsSource as NestableObservableCollection<TCollection, TItem>;
-
         protected abstract MvxObservableCollection<TCollection> Collection { get; }
 
         public IObservable<Unit> CollectionChange { get; }
-
-        public override IEnumerable ItemsSource
-        {
-            get => base.ItemsSource;
-            set
-            {
-                if (AnimatableCollection != null)
-                {
-                    AnimatableCollection.OnChildCollectionChanged -= OnChildCollectionChanged;
-                }
-
-                base.ItemsSource = value;
-
-                if (AnimatableCollection != null)
-                {
-                    AnimatableCollection.OnChildCollectionChanged += OnChildCollectionChanged;
-                }
-            }
-        }
 
         protected SegmentedRecyclerAdapter()
         {
@@ -74,56 +52,6 @@ namespace Toggl.Giskard.Adapters
             calculateHeaderIndexes();
 
             collectionChangedSubject.OnNext(Unit.Default);
-        }
-
-        protected void OnChildCollectionChanged(object sender, ChildCollectionChangedEventArgs args)
-        {
-            calculateHeaderIndexes();
-
-            MvxSingleton<IMvxMainThreadDispatcher>
-                .Instance
-                .RequestMainThreadAction(() => notifyForChanges(args));
-                
-            collectionChangedSubject.OnNext(Unit.Default);
-        }
-
-        private void notifyForChanges(ChildCollectionChangedEventArgs args)
-        {
-            var groupHeaderIndex = default(int);
-
-            lock (headerListLock)
-            {
-                groupHeaderIndex = headerIndexes[args.CollectionIndex];
-            }
-
-            NotifyItemChanged(groupHeaderIndex + HeaderOffsetForAnimation);
-
-            switch (args.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                    foreach (var index in args.Indexes)
-                    {
-                        var itemIndex = groupHeaderIndex + index + 1 + HeaderOffsetForAnimation;
-                        NotifyItemInserted(itemIndex);
-                    }
-                    break;
-
-                case NotifyCollectionChangedAction.Remove:
-                    foreach (var index in args.Indexes)
-                    {
-                        var itemIndex = groupHeaderIndex + index + 1 + HeaderOffsetForAnimation;
-                        NotifyItemRemoved(itemIndex);
-                    }
-                    break;
-
-                case NotifyCollectionChangedAction.Replace:
-                    foreach (var index in args.Indexes)
-                    {
-                        var itemIndex = groupHeaderIndex + index + 1 + HeaderOffsetForAnimation;
-                        NotifyItemChanged(itemIndex);
-                    }
-                    break;
-            }
         }
 
         protected virtual int HeaderOffsetForAnimation => 0;
@@ -212,11 +140,6 @@ namespace Toggl.Giskard.Adapters
                 return;
 
             collectionChangedSubject?.Dispose();
-
-            if (AnimatableCollection == null)
-                return;
-
-            AnimatableCollection.OnChildCollectionChanged -= OnChildCollectionChanged;
         }
     }
 }

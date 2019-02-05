@@ -89,7 +89,7 @@ namespace Toggl.Daneel
             var calendarService = new CalendarServiceIos(permissionsService);
             var notificationService = new NotificationServiceIos(permissionsService, timeService);
             var backgroundSyncService = new BackgroundSyncServiceIos();
-            var backgroundService = new BackgroundService(timeService);
+            var backgroundService = new BackgroundService(timeService, analyticsService);
             var automaticSyncingService = new AutomaticSyncingService(backgroundService, timeService, analyticsService);
             var errorHandlingService = new ErrorHandlingService(navigationService, settingsStorage);
 

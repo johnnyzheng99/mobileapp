@@ -19,8 +19,6 @@ namespace Toggl.Daneel.ViewControllers
     [ModalCardPresentation]
     public partial class SelectClientViewController : KeyboardAwareViewController<SelectClientViewModel>, IDismissableViewController
     {
-        private ClientTableViewSource tableViewSource = new ClientTableViewSource();
-
         public SelectClientViewController()
             : base(nameof(SelectClientViewController))
         {
@@ -36,10 +34,12 @@ namespace Toggl.Daneel.ViewControllers
             SuggestionsTableView.RegisterNibForCellReuse(ClientViewCell.Nib, ClientViewCell.Identifier);
             SuggestionsTableView.RegisterNibForCellReuse(CreateClientViewCell.Nib, CreateClientViewCell.Identifier);
             SuggestionsTableView.SeparatorStyle = UITableViewCellSeparatorStyle.None;
+
+            var tableViewSource = new ClientTableViewSource(SuggestionsTableView);
             SuggestionsTableView.Source = tableViewSource;
 
             ViewModel.Clients
-                .Subscribe(replaceClients)
+                .Subscribe(SuggestionsTableView.Rx().Items(tableViewSource))
                 .DisposedBy(DisposeBag);
 
             CloseButton.Rx()
@@ -50,7 +50,7 @@ namespace Toggl.Daneel.ViewControllers
                 .Subscribe(ViewModel.FilterText)
                 .DisposedBy(DisposeBag);
 
-            tableViewSource.ClientSelected
+            tableViewSource.Rx().ModelSelected()
                 .Subscribe(ViewModel.SelectClient.Inputs)
                 .DisposedBy(DisposeBag);
 
@@ -61,12 +61,6 @@ namespace Toggl.Daneel.ViewControllers
         {
             ViewModel.Close.Execute(Unit.Default);
             return true;
-        }
-
-        private void replaceClients(IEnumerable<SelectableClientBaseViewModel> clients)
-        {
-            tableViewSource.SetNewClients(clients);
-            SuggestionsTableView.ReloadData();
         }
 
         protected override void KeyboardWillShow(object sender, UIKeyboardEventArgs e)

@@ -42,7 +42,7 @@ namespace Toggl.Foundation.Tests.Sync
                 var lastTimeUsageStorage = Substitute.For<ILastTimeUsageStorage>();
                 var timeService = Substitute.For<ITimeService>();
                 Queue = new SyncStateQueue();
-                Transitions = new TransitionHandlerProvider();
+                Transitions = new TransitionHandlerProvider(analyticsService);
                 Scheduler = new TestScheduler();
                 StateMachine = new StateMachine(Transitions, Scheduler);
                 EntryPoints = new StateMachineEntryPoints();

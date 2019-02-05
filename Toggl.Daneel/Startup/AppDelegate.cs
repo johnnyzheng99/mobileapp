@@ -63,9 +63,6 @@ namespace Toggl.Daneel
             #if ENABLE_TEST_CLOUD
             Xamarin.Calabash.Start();
             #endif
-            #if USE_ANALYTICS
-            Facebook.CoreKit.ApplicationDelegate.SharedInstance.FinishedLaunching(application, launchOptions);
-            #endif
 
             return true;
         }
@@ -86,17 +83,8 @@ namespace Toggl.Daneel
         public override bool OpenUrl(UIApplication app, NSUrl url, NSDictionary options)
         {
             var openUrlOptions = new UIApplicationOpenUrlOptions(options);
-            var facebookOptions = new NSDictionary<NSString, NSObject>(
-                options.Keys.Select(key => (NSString)key).ToArray(),
-                options.Values);
 
-            return Google.SignIn.SignIn.SharedInstance.HandleUrl(url, openUrlOptions.SourceApplication, openUrlOptions.Annotation)
-                || Facebook.CoreKit.ApplicationDelegate.SharedInstance.OpenUrl(app, url, facebookOptions);
-        }
-
-        public override void OnActivated(UIApplication application)
-        {
-            Facebook.CoreKit.AppEvents.ActivateApp();
+            return Google.SignIn.SignIn.SharedInstance.HandleUrl(url, openUrlOptions.SourceApplication, openUrlOptions.Annotation);
         }
         #endif
 

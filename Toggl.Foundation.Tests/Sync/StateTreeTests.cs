@@ -1,6 +1,7 @@
 ﻿using System;
 using FluentAssertions;
 using NSubstitute;
+using Toggl.Foundation.Analytics;
 using Toggl.Foundation.Sync;
 using Toggl.Foundation.Tests.Generators;
 using Xunit;
@@ -13,10 +14,17 @@ namespace Toggl.Foundation.Tests.Sync
             where TStateResult : class, new()
             where TStateFactory : class
         {
-            protected TransitionHandlerProvider Provider { get; } = new TransitionHandlerProvider();
+            protected IAnalyticsService AnalyticsService { get; }
+            protected TransitionHandlerProvider Provider { get; }
 
             protected abstract void CallMethod(TStateResult result, TStateFactory factory);
             protected abstract TStateFactory ToStateFactory(Action action);
+
+            public ConfigureTransitionMethodTests()
+            {
+                AnalyticsService = Substitute.For<IAnalyticsService>();
+                Provider = new TransitionHandlerProvider(AnalyticsService);
+            }
 
             [Theory, LogIfTooSlow]
             [ConstructorData]
@@ -75,7 +83,14 @@ namespace Toggl.Foundation.Tests.Sync
 
         public sealed class TheGetTransitionHandlerMethod
         {
-            private TransitionHandlerProvider provider { get; } = new TransitionHandlerProvider();
+            private IAnalyticsService analyticsService { get; }
+            private TransitionHandlerProvider provider { get; }
+
+            public TheGetTransitionHandlerMethod()
+            {
+                analyticsService = Substitute.For<IAnalyticsService>();
+                provider = new TransitionHandlerProvider(analyticsService);
+            }
 
             [Fact, LogIfTooSlow]
             public void ThrowsIfArgumentIsNull()

@@ -28,7 +28,5 @@ namespace Toggl.Foundation.DataSources
         IFeedbackApi FeedbackApi { get; }
 
         IObservable<bool> HasUnsyncedData();
-
-        IObservable<Unit> Logout();
     }
 }

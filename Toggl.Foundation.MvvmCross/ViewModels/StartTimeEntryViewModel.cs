@@ -178,8 +178,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         public TimeSpan? Duration { get; private set; }
 
-        public NestableObservableCollection<WorkspaceGroupedCollection<AutocompleteSuggestion>, AutocompleteSuggestion> Suggestions { get; }
-            = new NestableObservableCollection<WorkspaceGroupedCollection<AutocompleteSuggestion>, AutocompleteSuggestion>();
+        public MvxObservableCollection<WorkspaceGroupedCollection<AutocompleteSuggestion>> Suggestions { get; }
+            = new MvxObservableCollection<WorkspaceGroupedCollection<AutocompleteSuggestion>>();
 
         public ITogglDataSource DataSource => dataSource;
 
@@ -741,6 +741,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             var firstSuggestion = suggestions.FirstOrDefault();
             if (firstSuggestion is ProjectSuggestion)
                 return suggestions
+                    .Cast<ProjectSuggestion>()
+                    .OrderBy(ps => ps.ProjectName)
                     .GroupByWorkspaceAddingNoProject()
                     .OrderByDefaultWorkspaceAndName(defaultWorkspace?.Id ?? 0);
 
@@ -781,8 +783,13 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                 yield return suggestion;
 
                 if (suggestion is ProjectSuggestion projectSuggestion && projectSuggestion.TasksVisible)
-                    foreach (var taskSuggestion in projectSuggestion.Tasks)
+                {
+                    var orderedTasks = projectSuggestion.Tasks
+                        .OrderBy(t => t.Name);
+
+                    foreach (var taskSuggestion in orderedTasks)
                         yield return taskSuggestion;
+                }
             }
         }
 

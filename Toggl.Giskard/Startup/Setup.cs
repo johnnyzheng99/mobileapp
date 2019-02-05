@@ -74,7 +74,7 @@ namespace Toggl.Giskard
             var database = new Database();
             var scheduler = Scheduler.Default;
             var timeService = new TimeService(scheduler);
-            var backgroundService = new BackgroundService(timeService);
+            var backgroundService = new BackgroundService(timeService, analyticsService);
             var suggestionProviderContainer = new SuggestionProviderContainer(
                 new MostUsedTimeEntrySuggestionProvider(database, timeService, maxNumberOfSuggestions)
             );

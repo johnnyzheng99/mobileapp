@@ -21,9 +21,8 @@ namespace Toggl.Daneel.ViewSources
         private readonly string cellIdentifier;
         private readonly string headerCellIdentifier;
         private readonly object animationLock = new object();
-        private readonly List<IDisposable> disposables = new List<IDisposable>();
 
-        private NestableObservableCollection<TCollection, TItem> observableCollection;
+        private MvxObservableCollection<TCollection> observableCollection;
 
         private readonly List<TCollection> displayedGroupedItems = new List<TCollection>();
 
@@ -35,7 +34,7 @@ namespace Toggl.Daneel.ViewSources
             set { throw new InvalidOperationException($"You must bind to the {nameof(ObservableCollection)} and not the {nameof(ItemsSource)}"); }
         }
 
-        public NestableObservableCollection<TCollection, TItem> ObservableCollection
+        public MvxObservableCollection<TCollection> ObservableCollection
         {
             get => observableCollection;
             set
@@ -43,7 +42,6 @@ namespace Toggl.Daneel.ViewSources
                 if (observableCollection != null)
                 {
                     observableCollection.CollectionChanged -= OnCollectionChanged;
-                    observableCollection.OnChildCollectionChanged -= OnChildCollectionChanged;
                 }
 
                 observableCollection = value;
@@ -53,7 +51,6 @@ namespace Toggl.Daneel.ViewSources
                 if (observableCollection != null)
                 {
                     observableCollection.CollectionChanged += OnCollectionChanged;
-                    observableCollection.OnChildCollectionChanged += OnChildCollectionChanged;
                 }
             }
         }
@@ -153,11 +150,6 @@ namespace Toggl.Daneel.ViewSources
             tryAnimateOnMainThread(() => animateSectionChangesIfPossible(args));
         }
 
-        protected void OnChildCollectionChanged(object sender, ChildCollectionChangedEventArgs args)
-        {
-            tryAnimateOnMainThread(() => animateRowChangesIfPossible(args));
-        }
-
         private void tryAnimateOnMainThread(Action animate)
         {
             InvokeOnMainThread(() =>
@@ -227,56 +219,6 @@ namespace Toggl.Daneel.ViewSources
             }
         }
 
-        private void animateRowChangesIfPossible(ChildCollectionChangedEventArgs args)
-        {
-            lock (animationLock)
-            {
-                TableView.BeginUpdates();
-                        
-                switch (args.Action)
-                {
-                    case NotifyCollectionChangedAction.Add:
-                        var indexPathsToAdd = args.Indexes
-                            .Select(row => NSIndexPath.FromRowSection(row, args.CollectionIndex))
-                            .ToArray();
-
-                        foreach (var indexPath in indexPathsToAdd)
-                            displayedGroupedItems[indexPath.Section].Insert(indexPath.Row, observableCollection[indexPath.Section][indexPath.Row]);
-
-                        TableView.InsertRows(indexPathsToAdd, AddAnimation);
-                        break;
-
-                    case NotifyCollectionChangedAction.Remove:
-                        var indexPathsToRemove = args.Indexes
-                            .Select(row => NSIndexPath.FromRowSection(row, args.CollectionIndex))
-                            .ToArray();
-
-                        foreach (var indexPath in indexPathsToRemove)
-                            displayedGroupedItems[indexPath.Section].RemoveAt(indexPath.Row);
-
-                        TableView.DeleteRows(indexPathsToRemove, RemoveAnimation);
-                        break;
-
-                    case NotifyCollectionChangedAction.Replace:
-                        var indexPathsToUpdate = args.Indexes
-                            .Select(row => NSIndexPath.FromRowSection(row, args.CollectionIndex))
-                            .ToArray();
-
-                        foreach (var indexPath in indexPathsToUpdate)
-                            displayedGroupedItems[indexPath.Section][indexPath.Row] = observableCollection[indexPath.Section][indexPath.Row];
-
-                        TableView.ReloadRows(indexPathsToUpdate, ReplaceAnimation);
-                        break;
-
-                    default:
-                        reloadTable();
-                        break;
-                }
-
-                TableView.EndUpdates();
-            }
-        }
-
         private void reloadTable()
         {
             cloneCollection();
@@ -296,7 +238,6 @@ namespace Toggl.Daneel.ViewSources
             if (!disposing || ObservableCollection == null) return;
 
             ObservableCollection.CollectionChanged -= OnCollectionChanged;
-            ObservableCollection.OnChildCollectionChanged -= OnChildCollectionChanged;
         }
 
         protected abstract TCollection CloneCollection(TCollection collection);

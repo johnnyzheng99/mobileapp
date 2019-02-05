@@ -1861,6 +1861,57 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
         public sealed class TheSuggestionsProperty : StartTimeEntryViewModelTest
         {
+            private IEnumerable<ProjectSuggestion> getProjectSuggestions(int count, int workspaceId)
+            {
+                for (int i = 0; i < count; i++)
+                    yield return getProjectSuggestion(i, workspaceId);
+            }
+
+            private ProjectSuggestion getProjectSuggestion(int projectId, int workspaceId)
+            {
+                return getProjectSuggestion(projectId, workspaceId, new List<IThreadSafeTask>());
+            }
+
+            private ProjectSuggestion getProjectSuggestion(int projectId, int workspaceId, IEnumerable<IThreadSafeTask> tasks)
+            {
+
+                var workspace = Substitute.For<IThreadSafeWorkspace>();
+                workspace.Name.Returns($"Workspace{workspaceId}");
+                workspace.Id.Returns(workspaceId);
+                var project = Substitute.For<IThreadSafeProject>();
+                project.Name.Returns($"Project{projectId}");
+                project.Workspace.Returns(workspace);
+                project.Active.Returns(true);
+                project.Tasks.Returns(tasks);
+                return new ProjectSuggestion(project);
+            }
+
+            private IEnumerable<string> projectNames(IEnumerable<AutocompleteSuggestion> autocompleteSuggestions)
+                => autocompleteSuggestions.Cast<ProjectSuggestion>().Select(suggestion => suggestion.ProjectName);
+
+            private IEnumerable<string> tasksNames(IEnumerable<AutocompleteSuggestion> autocompleteSuggestions)
+                => autocompleteSuggestions.Cast<TaskSuggestion>().Select(suggestion => suggestion.Name);
+
+            [Fact, LogIfTooSlow]
+            public async Task PrependsEmptyProjectToEveryGroup()
+            {
+                var suggestions = new List<ProjectSuggestion>();
+                suggestions.AddRange(getProjectSuggestions(3, 0));
+                suggestions.AddRange(getProjectSuggestions(4, 1));
+                suggestions.AddRange(getProjectSuggestions(1, 10));
+                suggestions.AddRange(getProjectSuggestions(10, 54));
+                var suggestionsObservable = Observable.Return(suggestions);
+                AutocompleteProvider.Query(Arg.Any<QueryInfo>()).Returns(suggestionsObservable);
+                ViewModel.Prepare();
+
+                await ViewModel.Initialize();
+
+                foreach (var group in ViewModel.Suggestions)
+                {
+                    group.Cast<ProjectSuggestion>().First().ProjectName.Should().Be(Resources.NoProject);
+                }
+            }
+
             [Fact, LogIfTooSlow]
             public async Task IsClearedWhenThereAreNoWordsToQuery()
             {
@@ -1904,6 +1955,48 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 var suggestion = ViewModel.Suggestions[0][0];
                 suggestion.Should().BeOfType<TimeEntrySuggestion>();
                 ((TimeEntrySuggestion)suggestion).ProjectId.Should().Be(ProjectId);
+            }
+
+            [Fact, LogIfTooSlow]
+            public async Task SortsProjectsByName()
+            {
+                var suggestions = new List<ProjectSuggestion>();
+                suggestions.Add(getProjectSuggestion(3, 0));
+                suggestions.Add(getProjectSuggestion(4, 1));
+                suggestions.Add(getProjectSuggestion(1, 0));
+                suggestions.Add(getProjectSuggestion(33, 1));
+                suggestions.Add(getProjectSuggestion(10, 1));
+                var suggestionsObservable = Observable.Return(suggestions);
+                AutocompleteProvider.Query(Arg.Any<QueryInfo>()).Returns(suggestionsObservable);
+                ViewModel.Prepare();
+                TestScheduler.Start();
+
+                ViewModel.Suggestions.Should().HaveCount(2);
+                projectNames(ViewModel.Suggestions[0]).Should().BeInAscendingOrder();
+                projectNames(ViewModel.Suggestions[1]).Should().BeInAscendingOrder();
+            }
+          
+            public async Task SortsTasksByName()
+            {
+                var suggestions = new List<ProjectSuggestion>();
+                suggestions.Add(getProjectSuggestion(3, 0, new[]
+                {
+                    new MockTask { Id = 2, WorkspaceId = 0, ProjectId = 3, Name = "Task2" },
+                    new MockTask { Id = 1, WorkspaceId = 0, ProjectId = 3, Name = "Task1" },
+                    new MockTask { Id = 3, WorkspaceId = 0, ProjectId = 3, Name = "Task3" }
+                }));
+                var suggestionsObservable = Observable.Return(suggestions);
+                AutocompleteProvider.Query(Arg.Any<QueryInfo>()).Returns(suggestionsObservable);
+                ViewModel.Prepare();
+                await ViewModel.Initialize();
+
+                TestScheduler.Start();
+
+                ViewModel.ToggleTaskSuggestionsCommand.Execute((ProjectSuggestion)ViewModel.Suggestions[0][1]);
+
+                ViewModel.Suggestions.Should().HaveCount(1);
+                ViewModel.Suggestions[0].Should().HaveCount(5);
+                tasksNames(ViewModel.Suggestions[0].Skip(2)).Should().BeInAscendingOrder();
             }
         }
 

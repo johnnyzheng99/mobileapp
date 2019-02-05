@@ -13,6 +13,8 @@ namespace Toggl.Daneel.Views.Settings
 {
     public sealed partial class DurationFormatViewCell : BaseTableViewCell<SelectableDurationFormatViewModel>
     {
+        public static readonly string Identifier = nameof(DurationFormatViewCell);
+
         public static readonly NSString Key = new NSString(nameof(DurationFormatViewCell));
         public static readonly UINib Nib;
 

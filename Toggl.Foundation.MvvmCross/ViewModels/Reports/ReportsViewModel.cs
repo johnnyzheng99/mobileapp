@@ -181,7 +181,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels.Reports
                 .AsDriver(schedulerProvider);
 
             DurationFormatObservable = dataSource.Preferences.Current
-                .Select(prefs => prefs.DurationFormat);
+                .Select(prefs => prefs.DurationFormat)
+                .AsDriver(schedulerProvider);
 
             SegmentsObservable = segmentsSubject.CombineLatest(DurationFormatObservable, applyDurationFormat);
             GroupedSegmentsObservable = SegmentsObservable.CombineLatest(DurationFormatObservable, groupSegments);

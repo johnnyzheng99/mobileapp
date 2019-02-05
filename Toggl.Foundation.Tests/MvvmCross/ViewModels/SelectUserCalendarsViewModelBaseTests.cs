@@ -9,6 +9,7 @@ using Toggl.Foundation.Interactors;
 using Toggl.Foundation.MvvmCross.ViewModels.Calendar;
 using Toggl.Foundation.Services;
 using Toggl.Multivac;
+using Toggl.Multivac.Extensions;
 using Xunit;
 using static Toggl.Multivac.Extensions.FunctionalExtensions;
 using Toggl.PrimeRadiant.Settings;
@@ -36,7 +37,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 => new MockSelectUserCalendarsViewModel(UserPreferences, InteractorFactory, RxActionFactory);
         }
 
-        public sealed class TheInitializeMethod : SelectUserCalendarsViewModelBaseTest
+        public sealed class TheConstructor : SelectUserCalendarsViewModelBaseTest
         {
             [Fact, LogIfTooSlow]
             public async Task FillsTheCalendarList()
@@ -51,12 +52,18 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     .Apply(Observable.Return);
                 InteractorFactory.GetUserCalendars().Execute().Returns(userCalendarsObservable);
 
-                await ViewModel.Initialize();
+                var viewModel = new MockSelectUserCalendarsViewModel(UserPreferences, InteractorFactory, RxActionFactory);
 
-                ViewModel.Calendars.Should().HaveCount(3);
-                ViewModel.Calendars.ForEach(group => group.Should().HaveCount(3));
+                await viewModel.Initialize();
+                var calendars = await viewModel.Calendars.FirstAsync();
+
+                calendars.Should().HaveCount(3);
+                calendars.ForEach(group => group.Items.Should().HaveCount(3));
             }
+        }
 
+        public sealed class TheInitializeMethod : SelectUserCalendarsViewModelBaseTest
+        {
             [Fact, LogIfTooSlow]
             public async Task HandlesNotAuthorizedException()
             {
@@ -66,8 +73,9 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     .Returns(Observable.Throw<IEnumerable<UserCalendar>>(new NotAuthorizedException("")));
 
                 await ViewModel.Initialize();
+                var calendars = await ViewModel.Calendars.FirstAsync();
 
-                ViewModel.Calendars.Should().HaveCount(0);
+                calendars.Should().HaveCount(0);
             }
 
             [Fact, LogIfTooSlow]
@@ -84,10 +92,11 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 InteractorFactory.GetUserCalendars().Execute().Returns(userCalendarsObservable);
 
                 await ViewModel.Initialize();
+                var calendars = await ViewModel.Calendars.FirstAsync();
 
-                foreach (var calendarGroup in ViewModel.Calendars)
+                foreach (var calendarGroup in calendars)
                 {
-                    calendarGroup.All(calendar => !calendar.Selected);
+                    calendarGroup.Items.None(calendar => calendar.InitiallySelected).Should().BeTrue();
                 }
             }
         }

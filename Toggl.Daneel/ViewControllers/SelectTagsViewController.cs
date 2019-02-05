@@ -25,7 +25,7 @@ namespace Toggl.Daneel.ViewControllers
 
             TitleLabel.Text = Resources.Tags;
             EmptyStateLabel.Text = Resources.EmptyTagText;
-            CloseButton.SetTitle(Resources.Save, UIControlState.Normal);
+            SaveButton.SetTitle(Resources.Save, UIControlState.Normal);
 
             var source = new SelectTagsTableViewSource(TagsTableView);
             TagsTableView.Source = source;

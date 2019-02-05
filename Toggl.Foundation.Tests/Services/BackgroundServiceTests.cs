@@ -5,6 +5,8 @@ using NSubstitute;
 using Xunit;
 using FsCheck.Xunit;
 using Toggl.Foundation.Services;
+using Toggl.Foundation.Tests.Generators;
+using Toggl.Foundation.Analytics;
 
 namespace Toggl.Foundation.Tests.Services
 {
@@ -13,19 +15,24 @@ namespace Toggl.Foundation.Tests.Services
         public abstract class BackgroundServiceTest
         {
             protected readonly ITimeService TimeService;
+            protected readonly IAnalyticsService AnalyticsService;
 
             public BackgroundServiceTest()
             {
                 TimeService = Substitute.For<ITimeService>();
+                AnalyticsService = Substitute.For<IAnalyticsService>();
             }
         }
 
         public sealed class TheConstructor
         {
-            [Fact, LogIfTooSlow]
-            public void ThrowsWhenTheArgumentIsNull()
+            [Theory, LogIfTooSlow]
+            [ConstructorData]
+            public void ThrowsWhenTheArgumentIsNull(bool useTimeService, bool useAnalyticsService)
             {
-                Action constructor = () => new BackgroundService(null);
+                var timeService = useTimeService ? Substitute.For<ITimeService>() : null;
+                var analyticsService = useAnalyticsService ? Substitute.For<IAnalyticsService>() : null;
+                Action constructor = () => new BackgroundService(timeService, analyticsService);
 
                 constructor.Should().Throw<ArgumentNullException>();
             }
@@ -39,7 +46,7 @@ namespace Toggl.Foundation.Tests.Services
             public void DoesNotEmitAnythingWhenItHasNotEnterBackgroundFirst()
             {
                 bool emitted = false;
-                var backgroundService = new BackgroundService(TimeService);
+                var backgroundService = new BackgroundService(TimeService, AnalyticsService);
                 backgroundService
                     .AppResumedFromBackground
                     .Subscribe(_ => emitted = true);
@@ -53,7 +60,7 @@ namespace Toggl.Foundation.Tests.Services
             public void EmitsValueWhenEnteringForegroundAfterBeingInBackground()
             {
                 bool emitted = false;
-                var backgroundService = new BackgroundService(TimeService);
+                var backgroundService = new BackgroundService(TimeService, AnalyticsService);
                 TimeService.CurrentDateTime.Returns(now);
                 backgroundService
                     .AppResumedFromBackground
@@ -69,7 +76,7 @@ namespace Toggl.Foundation.Tests.Services
             public void DoesNotEmitAnythingWhenTheEnterForegroundIsCalledMultipleTimes()
             {
                 bool emitted = false;
-                var backgroundService = new BackgroundService(TimeService);
+                var backgroundService = new BackgroundService(TimeService, AnalyticsService);
                 TimeService.CurrentDateTime.Returns(now);
                 backgroundService.EnterBackground();
                 TimeService.CurrentDateTime.Returns(now.AddMinutes(1));
@@ -88,7 +95,7 @@ namespace Toggl.Foundation.Tests.Services
             public void EmitsAValueWhenEnteringForegroundAfterBeingInBackgroundForMoreThanTheLimit(NonNegativeInt waitingTime)
             {
                 TimeSpan? resumedAfter = null;
-                var backgroundService = new BackgroundService(TimeService);
+                var backgroundService = new BackgroundService(TimeService, AnalyticsService);
                 backgroundService
                     .AppResumedFromBackground
                     .Subscribe(timeInBackground => resumedAfter = timeInBackground);
@@ -100,6 +107,23 @@ namespace Toggl.Foundation.Tests.Services
 
                 resumedAfter.Should().NotBeNull();
                 resumedAfter.Should().BeGreaterThan(TimeSpan.FromMinutes(waitingTime.Get));
+            }
+
+            [Fact]
+            public void TracksEventWhenAppResumed()
+            {
+                var backgroundService = new BackgroundService(TimeService, AnalyticsService);
+                backgroundService.EnterBackground();
+                backgroundService.EnterForeground();
+                AnalyticsService.Received().AppDidEnterForeground.Track();
+            }
+
+            [Fact]
+            public void TracksEventWhenAppGoesToBackground()
+            {
+                var backgroundService = new BackgroundService(TimeService, AnalyticsService);
+                backgroundService.EnterBackground();
+                AnalyticsService.Received().AppSentToBackground.Track();
             }
         }
     }

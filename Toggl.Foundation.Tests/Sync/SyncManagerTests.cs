@@ -330,6 +330,13 @@ namespace Toggl.Foundation.Tests.Sync
                     Queue.Dequeue();
                 });
             }
+
+            [Fact]
+            public void TracksSyncOperationStarted()
+            {
+                SyncManager.PushSync();
+                AnalyticsService.Received().SyncOperationStarted.Track(SyncState.Push.ToString());
+            }
         }
 
         public sealed class TheForceFullSyncMethod : SyncMethodTests
@@ -372,6 +379,13 @@ namespace Toggl.Foundation.Tests.Sync
 
                 LastTimeUsageStorage.Received().SetSuccessfulFullSync(now);
             }
+
+            [Fact]
+            public void TracksSyncOperationStarted()
+            {
+                SyncManager.ForceFullSync();
+                AnalyticsService.Received().SyncOperationStarted.Track(SyncState.Pull.ToString());
+            }
         }
 
         public sealed class TheCleanUpMethod : SyncMethodTests
@@ -389,6 +403,13 @@ namespace Toggl.Foundation.Tests.Sync
                     Queue.QueueCleanUp();
                     Queue.Dequeue();
                 });
+            }
+
+            [Fact]
+            public void TracksSyncOperationStarted()
+            {
+                SyncManager.CleanUp();
+                AnalyticsService.Received().SyncOperationStarted.Track(SyncState.CleanUp.ToString());
             }
         }
 
@@ -682,6 +703,18 @@ namespace Toggl.Foundation.Tests.Sync
                     new object[] { new ApiDeprecatedException(Substitute.For<IRequest>(), Substitute.For<IResponse>()) },
                     new object[] { new UnauthorizedException(Substitute.For<IRequest>(), Substitute.For<IResponse>()),  }
                 };
+
+            [Fact]
+            public void TracksSyncCompleted()
+            {
+                SyncProgress? emitted = null;
+                Queue.Dequeue().Returns(Sleep);
+
+                OrchestratorSyncComplete.OnNext(new Success(Pull));
+                SyncManager.ProgressObservable.Subscribe(progress => emitted = progress);
+
+                AnalyticsService.Received().SyncCompleted.Track();
+            }
         }
 
         public sealed class ErrorHandling : SyncManagerTestBase
@@ -760,7 +793,6 @@ namespace Toggl.Foundation.Tests.Sync
 
                 OrchestratorSyncComplete.OnNext(new Error(exception));
 
-                AnalyticsService.DidNotReceive().TrackAnonymized(Arg.Any<OfflineException>());
                 AnalyticsService.OfflineModeDetected.Received().Track();
             }
 
@@ -784,6 +816,16 @@ namespace Toggl.Foundation.Tests.Sync
                 Orchestrator.Received().Start(Arg.Is(Push));
             }
 
+            [Fact, LogIfTooSlow]
+            public void TracksSyncError()
+            {
+                var exception = new Exception();
+
+                OrchestratorSyncComplete.OnNext(new Error(exception));
+
+                AnalyticsService.Received().TrackAnonymized(exception);
+                AnalyticsService.Received().SyncFailed.Track(exception.GetType().FullName, exception.Message, exception.StackTrace);
+            }
         }
     }
 }

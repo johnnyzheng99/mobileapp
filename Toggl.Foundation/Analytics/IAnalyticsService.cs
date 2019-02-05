@@ -134,11 +134,25 @@ namespace Toggl.Foundation.Analytics
 
         IAnalyticsEvent<string, string, string> BackgroundSyncFailed { get; }
 
+        IAnalyticsEvent BackgroundSyncMustStopExcecution { get; }
+
         IAnalyticsEvent<int> RateLimitingDelayDuringSyncing { get; }
 
         IAnalyticsEvent<string, string> UnknownLoginFailure { get; }
 
         IAnalyticsEvent<string, string> UnknownSignUpFailure { get; }
+
+        IAnalyticsEvent<string> SyncOperationStarted { get; }
+
+        IAnalyticsEvent SyncCompleted { get; }
+
+        IAnalyticsEvent<string, string, string> SyncFailed { get; }
+
+        IAnalyticsEvent<string> SyncStateTransition { get; }
+
+        IAnalyticsEvent AppDidEnterForeground { get; }
+
+        IAnalyticsEvent AppSentToBackground { get; }
 
         void Track(string eventName, Dictionary<string, string> parameters = null);
 

@@ -435,6 +435,11 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
             private ProjectSuggestion getProjectSuggestion(int projectId, int workspaceId)
             {
+                return getProjectSuggestion(projectId, workspaceId, new List<IThreadSafeTask>());
+            }
+
+            private ProjectSuggestion getProjectSuggestion(int projectId, int workspaceId, IEnumerable<IThreadSafeTask> tasks)
+            {
                 var workspace = Substitute.For<IThreadSafeWorkspace>();
                 workspace.Name.Returns($"Workspace{workspaceId}");
                 workspace.Id.Returns(workspaceId);
@@ -442,8 +447,12 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 project.Name.Returns($"Project{projectId}");
                 project.Workspace.Returns(workspace);
                 project.Active.Returns(true);
+                project.Tasks.Returns(tasks);
                 return new ProjectSuggestion(project);
             }
+
+            private IEnumerable<string> tasksNames(IEnumerable<AutocompleteSuggestion> autocompleteSuggestions)
+                => autocompleteSuggestions.Cast<TaskSuggestion>().Select(suggestion => suggestion.Name);
 
             [Fact, LogIfTooSlow]
             public async Task IsClearedWhenTextIsChanged()
@@ -588,6 +597,33 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                         prevProjectName = suggestion.ProjectName;
                     }
                 }
+            }
+
+            [Fact, LogIfTooSlow]
+            public async Task SortsTasksByName()
+            {
+                var suggestions = new List<ProjectSuggestion>();
+                suggestions.Add(getProjectSuggestion(3, 0, new[]
+                {
+                    new MockTask { Id = 2, WorkspaceId = 0, ProjectId = 3, Name = "Task2" },
+                    new MockTask { Id = 1, WorkspaceId = 0, ProjectId = 3, Name = "Task1" },
+                    new MockTask { Id = 3, WorkspaceId = 0, ProjectId = 3, Name = "Task3" }
+                }));
+                var suggestionsObservable = Observable.Return(suggestions);
+                InteractorFactory
+                    .GetProjectsAutocompleteSuggestions(Arg.Any<IList<string>>())
+                    .Execute()
+                    .Returns(suggestionsObservable);
+
+                await ViewModel.Initialize();
+
+                TestScheduler.Start();
+
+                ViewModel.ToggleTaskSuggestionsCommand.Execute((ProjectSuggestion)ViewModel.Suggestions[0][1]);
+
+                ViewModel.Suggestions.Should().HaveCount(1);
+                ViewModel.Suggestions[0].Should().HaveCount(5);
+                tasksNames(ViewModel.Suggestions[0].Skip(2)).Should().BeInAscendingOrder();
             }
 
             [Fact, LogIfTooSlow]

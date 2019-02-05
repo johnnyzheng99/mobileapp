@@ -96,6 +96,79 @@ namespace Toggl.Tests.UI
         }
 
         [Test]
+        public void AddingAClientBeforeSavingPersistsTheClient()
+        {
+            const string description = "Field Research ";
+            app.EnterText(description);
+
+            var projectName = "Meme Production";
+            var clientName = "The World Wide Web";
+            app.CreateProjectInStartView(projectName, clientName);
+
+            app.Tap(StartTimeEntry.DoneButton);
+            app.Tap(Main.StopTimeEntryButton);
+
+            app.PullToRefresh();
+
+            app.WaitForElement(clientName);
+        }
+
+        [Test]
+        public void CreatingATimeEntryWithASingleTagWorks()
+        {
+            const string description = "Working from home ";
+            app.EnterText(description);
+
+            const string tag = "Tests";
+            app.AddTagInStartView(tag);
+
+            app.Tap(StartTimeEntry.DoneButton);
+            app.Tap(Main.StopTimeEntryButton);
+
+            //Open the edit view
+            app.OpenEditView();
+
+            //Open the tags view. We need to tap it twice because of the onboarding tooltip
+            app.WaitForElement(EditTimeEntry.EditTags);
+            app.Tap(EditTimeEntry.EditTags);
+            app.Tap(EditTimeEntry.EditTags);
+
+            app.WaitForElement(tag);
+        }
+
+        [Test]
+        public void CreatingATimeEntryWithASingleTagThatAlreadyExistsWorks()
+        {
+            const string description = "Working from home ";
+            const string secondDescription = "Working from home again ";
+            const string tag = "Tests";
+
+            // Create the time entry so the tag already exists when we select it
+            app.EnterText(description);
+            app.AddTagInStartView(tag);
+            app.Tap(StartTimeEntry.DoneButton);
+            app.Tap(Main.StopTimeEntryButton);
+
+            //Actual test starts here
+            app.Tap(Main.StartTimeEntryButton);
+            app.WaitForElement(StartTimeEntry.DoneButton);
+            app.EnterText(secondDescription);
+            app.AddTagInStartView(tag, shouldCreateTag: false);
+            app.Tap(StartTimeEntry.DoneButton);
+            app.Tap(Main.StopTimeEntryButton);
+
+            //Open the edit view
+            app.OpenEditView();
+
+            //Open the tags view. We need to tap it twice because of the onboarding tooltip
+            app.WaitForElement(EditTimeEntry.EditTags);
+            app.Tap(EditTimeEntry.EditTags);
+            app.Tap(EditTimeEntry.EditTags);
+
+            app.WaitForElement(tag);
+        }
+
+        [Test]
         public void AddingMultipleTagsBeforeSavingPersistsTheTags()
         {
             const string description = "Delicious meal ";

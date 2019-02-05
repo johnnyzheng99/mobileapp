@@ -8,6 +8,8 @@ namespace Toggl.Daneel.Views.Settings
 {
     public sealed partial class DateFormatViewCell : BaseTableViewCell<SelectableDateFormatViewModel>
     {
+        public static readonly string Identifier = nameof(DateFormatViewCell);
+
         public static readonly NSString Key = new NSString(nameof(DateFormatViewCell));
         public static readonly UINib Nib;
 

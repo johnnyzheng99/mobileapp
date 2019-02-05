@@ -10,6 +10,10 @@ namespace Toggl.Giskard.Services
     {
         public override void EnableBackgroundSync()
         {
+            // Background sync is temporary disabled due to a crash that is hard to reproduce
+            DisableBackgroundSync();
+            return;
+
             var context = Application.Context;
             var jobScheduler = (JobScheduler)context.GetSystemService(Context.JobSchedulerService);
             var periodicity = (long)MinimumBackgroundFetchInterval.TotalMilliseconds;

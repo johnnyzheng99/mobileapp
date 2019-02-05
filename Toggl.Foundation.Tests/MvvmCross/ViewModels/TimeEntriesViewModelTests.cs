@@ -2,15 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
-using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Reflection.Metadata;
-using System.Threading;
 using FluentAssertions;
 using FsCheck;
 using FsCheck.Xunit;
-using Microsoft.Reactive.Testing;
 using NSubstitute;
 using Toggl.Foundation.Analytics;
 using Toggl.Foundation.DataSources;
@@ -24,7 +20,6 @@ using Toggl.Foundation.Tests.Generators;
 using Toggl.Foundation.Tests.Mocks;
 using Toggl.Multivac;
 using Toggl.Multivac.Extensions;
-using Toggl.PrimeRadiant.Models;
 using Xunit;
 using ThreadingTask = System.Threading.Tasks.Task;
 
@@ -379,6 +374,29 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 await observableA;
 
                 InteractorFactory.Received().DeleteTimeEntry(Arg.Is(timeEntryA.Id)).Execute();
+            }
+
+            [Fact]
+            public async ThreadingTask ImmediatelyHardDeletesTheTimeEntryWhenCallingFinilizeDelayDeleteTimeEntryIfNeeded()
+            {
+                var timeEntryA = new TimeEntryViewModel(new MockTimeEntry { Id = 1, Duration = 123, TagIds = Array.Empty<long>(), Workspace = new MockWorkspace() }, DurationFormat.Classic);
+
+                var observableA = viewModel.DelayDeleteTimeEntry.Execute(timeEntryA);
+                SchedulerProvider.TestScheduler.AdvanceBy(Constants.UndoTime.Ticks / 2);
+                await viewModel.FinilizeDelayDeleteTimeEntryIfNeeded();
+
+                InteractorFactory.Received().DeleteTimeEntry(Arg.Is(timeEntryA.Id)).Execute();
+            }
+
+            [Fact]
+            public async ThreadingTask DoesNotHardDeletesTheTimeEntryWhenNotCallingFinilizeDelayDeleteTimeEntryIfNeeded()
+            {
+                var timeEntryA = new TimeEntryViewModel(new MockTimeEntry { Id = 1, Duration = 123, TagIds = Array.Empty<long>(), Workspace = new MockWorkspace() }, DurationFormat.Classic);
+
+                var observableA = viewModel.DelayDeleteTimeEntry.Execute(timeEntryA);
+                SchedulerProvider.TestScheduler.AdvanceBy(Constants.UndoTime.Ticks / 2);
+
+                InteractorFactory.DidNotReceive().DeleteTimeEntry(Arg.Is(timeEntryA.Id)).Execute();
             }
         }
 

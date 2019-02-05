@@ -352,6 +352,17 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             await interactorFactory.ContinueMostRecentTimeEntry().Execute();
         }
 
+        public override void ViewDisappeared()
+        {
+            base.ViewDisappeared();
+            viewDisappearedAsync();
+        }
+
+        private async Task viewDisappearedAsync()
+        {
+            await TimeEntriesViewModel.FinilizeDelayDeleteTimeEntryIfNeeded();
+        }
+
         public override void ViewAppearing()
         {
             base.ViewAppearing();

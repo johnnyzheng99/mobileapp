@@ -17,6 +17,8 @@ namespace Toggl.Foundation.MvvmCross.Helper
         private static readonly MvxColor nearlyWhite = new MvxColor(250, 251, 252);
         private static readonly MvxColor silver = new MvxColor(181, 188, 192);
         private static readonly MvxColor brownishGrey = new MvxColor(94, 91, 91);
+        private static readonly MvxColor whiteTwo = new MvxColor(244, 244, 244);
+        private static readonly MvxColor paleGreyTwo = nearlyWhite;
 
         public static class Onboarding
         {
@@ -90,11 +92,35 @@ namespace Toggl.Foundation.MvvmCross.Helper
         {
             public static readonly MvxColor ClientColor = new MvxColor(163, 163, 163);
 
+            public static readonly MvxColor AddDescriptionTextColor = pinkishGrey;
+
             public static readonly MvxColor SectionFooter = new MvxColor(250, 251, 252);
 
             public static readonly MvxColor DeleteSwipeActionBackground = new MvxColor(247, 64, 73);
 
             public static readonly MvxColor ContinueSwipeActionBackground = lightishGreen;
+
+            public static class Grouping
+            {
+                public static class Collapsed
+                {
+                    public static readonly MvxColor Border = new MvxColor(232, 232, 232);
+                    public static readonly MvxColor Background = new MvxColor(255, 255, 255);
+                    public static readonly MvxColor Text = brownishGrey;
+                }
+
+                public static class Expanded
+                {
+                    public static readonly MvxColor Border = new MvxColor(255, 255, 255, 0);
+                    public static readonly MvxColor Background = whiteTwo;
+                    public static readonly MvxColor Text = lightishGreen;
+                }
+
+                public static class GroupedTimeEntry
+                {
+                    public static readonly MvxColor Background = paleGreyTwo;
+                }
+            }
         }
 
         public static class StartTimeEntry

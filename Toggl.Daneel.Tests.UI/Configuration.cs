@@ -16,7 +16,9 @@ namespace Toggl.Tests.UI
             // A Xamarin.UITest update might fix this in the future.
             resetSimulator(bootedDeviceId);
 
-            var app = ConfigureApp.iOS.StartApp();
+            var app = ConfigureApp.iOS
+                .AppBundle("../../bin/iPhoneSimulator/Debug/Toggl.Daneel.app")
+                .StartApp();
 
             bootedDeviceId = app.Device.DeviceIdentifier;
 

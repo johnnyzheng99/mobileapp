@@ -1,6 +1,5 @@
 ﻿using System;
-using Foundation;
-using Toggl.Daneel.ViewSources;
+using Toggl.Daneel.ViewSources.Generic.TableView;
 using UIKit;
 
 namespace Toggl.Daneel.Cells

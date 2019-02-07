@@ -13,27 +13,20 @@ using Math = System.Math;
 
 namespace Toggl.Daneel.Views.Calendar
 {
-    public sealed class CalendarCollectionViewZoomHelper : CalendarCollectionViewAutoScrollHelper, IUIGestureRecognizerDelegate
+    public sealed class CalendarCollectionViewZoomHelper : NSObject, IUIGestureRecognizerDelegate
     {
         private UIPinchGestureRecognizer pinchGestureRecognizer;
         private CalendarCollectionViewLayout layout;
 
-        //private CGPoint firstPoint;
-
-        public CalendarCollectionViewZoomHelper(
-            UICollectionView collectionView,
-            CalendarCollectionViewLayout layout) : base(collectionView, layout)
+        public CalendarCollectionViewZoomHelper(UICollectionView collectionView, CalendarCollectionViewLayout layout)
         {
+            Ensure.Argument.IsNotNull(collectionView, nameof(collectionView));
             Ensure.Argument.IsNotNull(layout, nameof(layout));
             this.layout = layout;
 
             pinchGestureRecognizer = new UIPinchGestureRecognizer(onPinchUpdated);
             pinchGestureRecognizer.Delegate = this;
             collectionView.AddGestureRecognizer(pinchGestureRecognizer);
-        }
-
-        public CalendarCollectionViewZoomHelper(IntPtr handle) : base(handle)
-        {
         }
 
         void onPinchUpdated(UIPinchGestureRecognizer gesture)

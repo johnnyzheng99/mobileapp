@@ -121,13 +121,6 @@ namespace Toggl.Daneel.Views.Calendar
 
             hourHeight = (float)Math.Max(minHourHeight, Math.Min(maxHourHeight, newHourHeight));
 
-            if (newHourHeight < minHourHeight)
-            {
-                var offset = basePoint.Y - basePoint.Y * scale;
-                CollectionView.ContentOffset = new CGPoint(CollectionView.ContentOffset.X, CollectionView.ContentOffset.Y - offset);
-                Console.WriteLine(CollectionView.ContentOffset);
-            }
-
             InvalidateLayout();
             InvalidateLayoutForVisibleItems();
             InvalidateCurrentTimeLayout();

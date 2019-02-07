@@ -11,3 +11,8 @@ While running tests on iOS is much simpler than on Android, there are some cavea
 - If you don't see the tests there yet, double click Daneel > Toggl.Daneel.Tests.UI; fix whatever bugs might be there (the build might be broken) > click again > You'll eventually see all the tests from Shared.Toggl.Tests.UI;
 - On Toggl.Tests.UI you can run all the tests or only the ones you want.
 - ✨
+
+##### To run on Rider:
+- Set build target to `Debug | iPhoneSimulator`
+- Set whatever device you want to run the tests on in the Run Configurations
+- Just go to Unit Tests -> Toggl.Tests.UI and run them as normal tests

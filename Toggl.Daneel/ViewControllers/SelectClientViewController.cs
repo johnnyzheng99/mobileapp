@@ -39,7 +39,7 @@ namespace Toggl.Daneel.ViewControllers
             SuggestionsTableView.Source = tableViewSource;
 
             ViewModel.Clients
-                .Subscribe(SuggestionsTableView.Rx().Items(tableViewSource))
+                .Subscribe(SuggestionsTableView.Rx().ReloadItems(tableViewSource))
                 .DisposedBy(DisposeBag);
 
             CloseButton.Rx()

@@ -20,12 +20,11 @@ namespace Toggl.Daneel.Views.Calendar
     public sealed class CalendarCollectionViewLayout : UICollectionViewLayout
     {
         private const int hoursPerDay = 24;
-        private const float maxHourHeight = 124;
-        private const float minHourHeight = 25;
+        private float minHourHeight = 28;
+        private float maxHourHeight = 28 * 4;
+        private float hourHeight = 56;
 
-        public BehaviorSubject<float> hourHeightSubject = new BehaviorSubject<float>(56);
-        public float HourHeight => hourHeightSubject.Value;
-        public IObservable<float> HourHeightObservable { get; }
+        public float HourHeight => hourHeight;
 
         private nfloat minItemHeight => HourHeight / 4;
         private static readonly nfloat leftPadding = 76;
@@ -61,7 +60,7 @@ namespace Toggl.Daneel.Views.Calendar
         }
 
         public CalendarCollectionViewLayout(
-            ITimeService timeService, 
+            ITimeService timeService,
             ICalendarCollectionViewLayoutDataSource dataSource,
             ISchedulerProvider schedulerProvider)
             : base()
@@ -75,10 +74,6 @@ namespace Toggl.Daneel.Views.Calendar
             this.schedulerProvider = schedulerProvider;
 
             date = timeService.CurrentDateTime.ToLocalTime().Date;
-
-            HourHeightObservable = hourHeightSubject
-                .DistinctUntilChanged()
-                .AsDriver(schedulerProvider);
 
             timeService
                 .MidnightObservable
@@ -95,6 +90,14 @@ namespace Toggl.Daneel.Views.Calendar
             currentTimeLayoutAttributes = UICollectionViewLayoutAttributes.CreateForSupplementaryView(CurrentTimeSupplementaryViewKind, NSIndexPath.FromItemSection(0, 0));
         }
 
+        public override void PrepareLayout()
+        {
+            base.PrepareLayout();
+
+            minHourHeight = (float)CollectionView.Bounds.Height / 26;
+            maxHourHeight = minHourHeight * 5;
+        }
+
         public override CGSize CollectionViewContentSize
         {
             get
@@ -105,12 +108,29 @@ namespace Toggl.Daneel.Views.Calendar
             }
         }
 
-        public void ScaleHourHeight(nfloat scale)
+        public void ScaleHourHeight(nfloat scale, CGPoint basePoint)
         {
             Double newHourHeight = HourHeight * scale;
-            newHourHeight = Math.Max(minHourHeight, Math.Min(maxHourHeight, newHourHeight));
-            hourHeightSubject.OnNext((float)newHourHeight);
+
+            if (newHourHeight >= minHourHeight && newHourHeight <= maxHourHeight)
+            {
+                var offset = basePoint.Y - basePoint.Y * scale;
+                CollectionView.ContentOffset = new CGPoint(CollectionView.ContentOffset.X, CollectionView.ContentOffset.Y - offset);
+                Console.WriteLine(CollectionView.ContentOffset);
+            }
+
+            hourHeight = (float)Math.Max(minHourHeight, Math.Min(maxHourHeight, newHourHeight));
+
+            if (newHourHeight < minHourHeight)
+            {
+                var offset = basePoint.Y - basePoint.Y * scale;
+                CollectionView.ContentOffset = new CGPoint(CollectionView.ContentOffset.X, CollectionView.ContentOffset.Y - offset);
+                Console.WriteLine(CollectionView.ContentOffset);
+            }
+
             InvalidateLayout();
+            InvalidateLayoutForVisibleItems();
+            InvalidateCurrentTimeLayout();
         }
 
         public DateTimeOffset DateAtPoint(CGPoint point)

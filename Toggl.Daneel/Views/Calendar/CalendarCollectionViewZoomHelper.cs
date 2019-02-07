@@ -35,26 +35,24 @@ namespace Toggl.Daneel.Views.Calendar
         public CalendarCollectionViewZoomHelper(IntPtr handle) : base(handle)
         {
         }
-        
+
         void onPinchUpdated(UIPinchGestureRecognizer gesture)
         {
+            var pinchCenter = gesture.LocationInView(gesture.View);
+
             switch (gesture.State)
             {
                 case UIGestureRecognizerState.Began:
-                    layout.ScaleHourHeight(gesture.Scale);
-                    Console.WriteLine(gesture.Scale);
+                    layout.ScaleHourHeight(gesture.Scale, pinchCenter);
                     break;
 
                 case UIGestureRecognizerState.Changed:
-                    //var currentScale = 
-                    Console.WriteLine(gesture.Scale);
-                    layout.ScaleHourHeight(gesture.Scale);
+                    layout.ScaleHourHeight(gesture.Scale, pinchCenter);
                     gesture.Scale = 1;
                     break;
 
                 case UIGestureRecognizerState.Ended:
-                    layout.ScaleHourHeight(gesture.Scale);
-                    Console.WriteLine(gesture.Scale);
+                    layout.ScaleHourHeight(gesture.Scale, pinchCenter);
                     break;
 
                 case UIGestureRecognizerState.Cancelled:

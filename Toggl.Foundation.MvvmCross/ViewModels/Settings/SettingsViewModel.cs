@@ -16,6 +16,7 @@ using Toggl.Foundation.Extensions;
 using Toggl.Foundation.Interactors;
 using Toggl.Foundation.Login;
 using Toggl.Foundation.Models.Interfaces;
+using Toggl.Foundation.MvvmCross.Extensions;
 using Toggl.Foundation.MvvmCross.Parameters;
 using Toggl.Foundation.MvvmCross.Services;
 using Toggl.Foundation.MvvmCross.Transformations;
@@ -108,7 +109,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             IPrivateSharedStorageService privateSharedStorageService,
             IIntentDonationService intentDonationService,
             IStopwatchProvider stopwatchProvider,
-            IRxActionFactory rxActionFactory)
+            IRxActionFactory rxActionFactory,
+            ISchedulerProvider schedulerProvider)
         {
             Ensure.Argument.IsNotNull(dataSource, nameof(dataSource));
             Ensure.Argument.IsNotNull(platformInfo, nameof(platformInfo));
@@ -123,6 +125,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             Ensure.Argument.IsNotNull(intentDonationService, nameof(intentDonationService));
             Ensure.Argument.IsNotNull(stopwatchProvider, nameof(stopwatchProvider));
             Ensure.Argument.IsNotNull(rxActionFactory, nameof(rxActionFactory));
+            Ensure.Argument.IsNotNull(schedulerProvider, nameof(schedulerProvider));
 
             this.dataSource = dataSource;
             this.platformInfo = platformInfo;
@@ -139,26 +142,37 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             this.privateSharedStorageService = privateSharedStorageService;
             this.rxActionFactory = rxActionFactory;
 
-            IsSynced = dataSource.SyncManager.ProgressObservable.SelectMany(checkSynced);
+            IsSynced = dataSource.SyncManager
+                .ProgressObservable
+                .SelectMany(checkSynced)
+                .AsDriver(schedulerProvider);;
 
             IsRunningSync =
                 dataSource.SyncManager
                     .ProgressObservable
-                    .Select(isRunningSync);
+                    .Select(isRunningSync)
+                    .AsDriver(schedulerProvider);
 
             Name =
                 dataSource.User.Current
                     .Select(user => user.Fullname)
-                    .DistinctUntilChanged();
+                    .DistinctUntilChanged()
+                    .AsDriver(schedulerProvider);
 
             Email =
                 dataSource.User.Current
                     .Select(user => user.Email.ToString())
-                    .DistinctUntilChanged();
+                    .DistinctUntilChanged()
+                    .AsDriver(schedulerProvider);
 
-            IsManualModeEnabled = userPreferences.IsManualModeEnabledObservable;
-            AreRunningTimerNotificationsEnabled = userPreferences.AreRunningTimerNotificationsEnabledObservable;
-            AreStoppedTimerNotificationsEnabled = userPreferences.AreStoppedTimerNotificationsEnabledObservable;
+            IsManualModeEnabled = userPreferences.IsManualModeEnabledObservable
+                .AsDriver(schedulerProvider);
+
+            AreRunningTimerNotificationsEnabled = userPreferences.AreRunningTimerNotificationsEnabledObservable
+                .AsDriver(schedulerProvider);
+
+            AreStoppedTimerNotificationsEnabled = userPreferences.AreStoppedTimerNotificationsEnabledObservable
+                .AsDriver(schedulerProvider);
 
             WorkspaceName =
                 dataSource.User.Current
@@ -167,35 +181,41 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                         .TrackException<InvalidOperationException, IThreadSafeWorkspace>("SettingsViewModel.constructor")
                         .Execute()
                     )
-                    .Select(workspace => workspace.Name);
+                    .Select(workspace => workspace.Name)
+                    .AsDriver(schedulerProvider);;
 
             BeginningOfWeek =
                 dataSource.User.Current
                     .Select(user => user.BeginningOfWeek)
                     .DistinctUntilChanged()
-                    .Select(beginningOfWeek => beginningOfWeek.ToString());
+                    .Select(beginningOfWeek => beginningOfWeek.ToString())
+                    .AsDriver(schedulerProvider);;
 
             DateFormat =
                 dataSource.Preferences.Current
                     .Select(preferences => preferences.DateFormat.Localized)
-                    .DistinctUntilChanged();
+                    .DistinctUntilChanged()
+                    .AsDriver(schedulerProvider);;
 
             DurationFormat =
                 dataSource.Preferences.Current
                     .Select(preferences => preferences.DurationFormat)
                     .Select(DurationFormatToString.Convert)
-                    .DistinctUntilChanged();
+                    .DistinctUntilChanged()
+                    .AsDriver(schedulerProvider);
 
             UseTwentyFourHourFormat =
                 dataSource.Preferences.Current
                     .Select(preferences => preferences.TimeOfDayFormat.IsTwentyFourHoursFormat)
-                    .DistinctUntilChanged();
+                    .DistinctUntilChanged()
+                    .AsDriver(schedulerProvider);
 
             UserAvatar =
                 dataSource.User.Current
                     .Select(user => user.ImageUrl)
                     .DistinctUntilChanged()
-                    .SelectMany(url => interactorFactory.GetUserAvatar(url).Execute());
+                    .SelectMany(url => interactorFactory.GetUserAvatar(url).Execute())
+                    .AsDriver(schedulerProvider);
 
             Workspaces =
                 dataSource.User.Current
@@ -204,9 +224,11 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                         .GetAllWorkspaces()
                         .Execute()
                         .Select(selectableWorkspacesFromWorkspaces(user))
-                    );
+                    )
+                    .AsDriver(schedulerProvider);
 
-            LoggingOut = loggingOutSubject.AsObservable();
+            LoggingOut = loggingOutSubject.AsObservable()
+                .AsDriver(schedulerProvider);
 
             dataSource.User.Current
                 .Subscribe(user => currentUser = user)
@@ -220,7 +242,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                 .Subscribe(isSyncing => this.isSyncing = isSyncing)
                 .DisposedBy(disposeBag);
 
-            IsFeedbackSuccessViewShowing = isFeedbackSuccessViewShowing.AsObservable();
+            IsFeedbackSuccessViewShowing = isFeedbackSuccessViewShowing.AsObservable()
+                .AsDriver(schedulerProvider);
 
             OpenCalendarSettings = rxActionFactory.FromAsync(openCalendarSettings);
             OpenNotificationSettings = rxActionFactory.FromAsync(openNotificationSettings);

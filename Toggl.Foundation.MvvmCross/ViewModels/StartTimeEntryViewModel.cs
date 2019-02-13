@@ -75,15 +75,6 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         private bool isRunning => !Duration.HasValue;
 
-        private int DescriptionByteCount
-            => textFieldInfo.Description.LengthInBytes();
-
-        public int DescriptionRemainingBytes
-            => MaxTimeEntryDescriptionLengthInBytes - DescriptionByteCount;
-
-        public bool DescriptionLengthExceeded
-            => DescriptionByteCount > MaxTimeEntryDescriptionLengthInBytes;
-
         public bool SuggestCreation
         {
             get
@@ -94,9 +85,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                     return false;
 
                 if (IsSuggestingProjects)
-                    return Suggestions.None(
-                               c => c.Any(s => s is ProjectSuggestion pS && pS.ProjectName == CurrentQuery))
-                           && CurrentQuery.LengthInBytes() <= MaxProjectNameLengthInBytes
+                    return CurrentQuery.LengthInBytes() <= MaxProjectNameLengthInBytes
                            && shouldSuggestProjectCreation;
 
                 if (IsSuggestingTags)

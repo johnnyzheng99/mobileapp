@@ -569,6 +569,10 @@
       <DependentUpon>MainFragment.cs</DependentUpon>
     </Compile>
 
+    <Compile Include="Fragments\SelectUserCalendarsFragment.cs" />
+    <Compile Include="Fragments\SelectUserCalendarsFragment.ViewBinds.cs">
+      <DependentUpon>SelectUserCalendarsFragment.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\AndroidManifest.xml" />
@@ -982,6 +986,7 @@
     <AndroidResource Include="Resources\layout\WelcomeBackPlaceholder.axml" />
     <AndroidResource Include="Resources\layout\ReportsActivity.axml" />
     <AndroidResource Include="Resources\layout\MainActivity.axml" />
+    <AndroidResource Include="Resources\layout\SelectUserCalendarsFragment.axml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Toggl.Foundation\Toggl.Foundation.csproj">

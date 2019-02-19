@@ -26,6 +26,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels.Calendar
 
         protected bool ForceItemSelection { get; private set; }
 
+        protected HashSet<string> InitialSelectedCalendarIds { get; } = new HashSet<string>();
         protected HashSet<string> SelectedCalendarIds { get; } = new HashSet<string>();
 
         protected SelectUserCalendarsViewModelBase(
@@ -57,7 +58,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels.Calendar
         {
             await base.Initialize();
 
-            SelectedCalendarIds.AddRange(userPreferences.EnabledCalendarIds());
+            var calendarIds = userPreferences.EnabledCalendarIds();
+            InitialSelectedCalendarIds.AddRange(calendarIds);
+            SelectedCalendarIds.AddRange(calendarIds);
         }
 
         private IImmutableList<CollectionSection<string, SelectableUserCalendarViewModel>> group(IEnumerable<UserCalendar> calendars)

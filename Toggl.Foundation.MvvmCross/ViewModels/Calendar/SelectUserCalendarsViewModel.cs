@@ -18,6 +18,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels.Calendar
         private readonly IMvxNavigationService navigationService;
         private readonly IRxActionFactory rxActionFactory;
 
+        public UIAction Close { get; private set; }
         public UIAction Done { get; private set; }
 
         public SelectUserCalendarsViewModel(
@@ -43,10 +44,14 @@ namespace Toggl.Foundation.MvvmCross.ViewModels.Calendar
                     .DistinctUntilChanged()
                 : Observable.Return(true);
 
+            Close = rxActionFactory.FromAsync(close);
             Done = rxActionFactory.FromAsync(done, enabledObservable);
 
             return base.Initialize();
         }
+
+        private Task close()
+            => navigationService.Close(this, InitialSelectedCalendarIds.ToArray());
 
         private Task done()
             => navigationService.Close(this, SelectedCalendarIds.ToArray());

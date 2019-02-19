@@ -51,6 +51,48 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             }
         }
 
+        public sealed class TheCloseAction : SelectUserCalendarsViewModelTest
+        {
+            [Fact, LogIfTooSlow]
+            public async Task ClosesTheViewModelAndReturnsTheInitialCalendarIds()
+            {
+                var initialSelectedIds = new List<string> { "0", "1", "2", "3" };
+                UserPreferences.EnabledCalendarIds().Returns(initialSelectedIds);
+
+                var userCalendars = Enumerable
+                    .Range(0, 9)
+                    .Select(id => new UserCalendar(
+                        id.ToString(),
+                        $"Calendar #{id}",
+                        $"Source #{id % 3}",
+                        false));
+
+                InteractorFactory
+                    .GetUserCalendars()
+                    .Execute()
+                    .Returns(Observable.Return(userCalendars));
+                await ViewModel.Initialize();
+                var selectedIds = new[] { "0", "2", "4", "7" };
+
+                var selectCalendars = Observable.Concat(
+                    userCalendars
+                        .Where(calendar => selectedIds.Contains(calendar.Id))
+                        .Select(calendar => new SelectableUserCalendarViewModel(calendar, false))
+                        .Select(calendar => Observable.Defer(() => ViewModel.SelectCalendar.Execute(calendar)))
+                );
+
+                var auxObserver = TestScheduler.CreateObserver<Unit>();
+                Observable.Concat(
+                        selectCalendars,
+                        Observable.Defer(() => ViewModel.Close.Execute())
+                        )
+                    .Subscribe(auxObserver);
+                TestScheduler.Start();
+
+                await NavigationService.Received().Close(ViewModel, Arg.Is<string[]>(ids => ids.SequenceEqual(initialSelectedIds)));
+            }
+        }
+
         public sealed class TheDoneAction : SelectUserCalendarsViewModelTest
         {
             [Fact, LogIfTooSlow]

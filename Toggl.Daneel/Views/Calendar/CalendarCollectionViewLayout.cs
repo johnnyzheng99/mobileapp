@@ -22,11 +22,9 @@ namespace Toggl.Daneel.Views.Calendar
         private const int hoursPerDay = 24;
         private float minHourHeight = 28;
         private float maxHourHeight = 28 * 4;
-        private float hourHeight = 56;
 
-        public float HourHeight => hourHeight;
+        public float HourHeight { get; private set; } = 56;
 
-        private nfloat minItemHeight => HourHeight / 4;
         private static readonly nfloat leftPadding = 76;
         private static readonly nfloat rightPadding = 16;
         private static readonly nfloat hourSupplementaryLabelHeight = 20;
@@ -114,7 +112,7 @@ namespace Toggl.Daneel.Views.Calendar
                 CollectionView.ContentOffset = new CGPoint(CollectionView.ContentOffset.X, CollectionView.ContentOffset.Y - offset);
             }
 
-            hourHeight = (float)Math.Max(minHourHeight, Math.Min(maxHourHeight, newHourHeight));
+            HourHeight = (float)Math.Max(minHourHeight, Math.Min(maxHourHeight, newHourHeight));
 
             InvalidateLayout();
             InvalidateLayoutForVisibleItems();
@@ -227,6 +225,9 @@ namespace Toggl.Daneel.Views.Calendar
             return new CGRect(x, y, width, height);
         }
 
+        private nfloat minItemHeight()
+            => HourHeight / 4;
+
         private nint zIndexForItemAtIndexPath(NSIndexPath indexPath)
         {
             var editingIndexIndexPath = dataSource.IndexPathForEditingItem();
@@ -288,7 +289,7 @@ namespace Toggl.Daneel.Views.Calendar
 
             var totalInterItemSpacing = (attrs.TotalColumns - 1) * horizontalItemSpacing;
             var width = (CollectionViewContentSize.Width - leftPadding - rightPadding - totalInterItemSpacing) / attrs.TotalColumns;
-            var height = Math.Max(minItemHeight, HourHeight * duration.TotalMinutes / 60) - verticalItemSpacing;
+            var height = Math.Max(minItemHeight(), HourHeight * duration.TotalMinutes / 60) - verticalItemSpacing;
             var x = leftPadding + (width + horizontalItemSpacing) * attrs.ColumnIndex;
             var y = yHour + yMins + verticalItemSpacing;
 

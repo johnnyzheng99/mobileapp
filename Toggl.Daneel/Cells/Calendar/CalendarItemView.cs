@@ -16,6 +16,8 @@ namespace Toggl.Daneel.Cells.Calendar
 {
     public sealed partial class CalendarItemView : ReactiveCollectionViewCell<CalendarItem>
     {
+        private const int shortCalendarItemThreshold = 28;
+
         private static readonly Dictionary<CalendarIconKind, UIImage> images;
 
         private CALayer backgroundLayer;
@@ -32,10 +34,9 @@ namespace Toggl.Daneel.Cells.Calendar
         public CGRect TopDragTouchArea => TopDragIndicator.Frame.Inset(-20, -20);
         public CGRect BottomDragTouchArea => BottomDragIndicator.Frame.Inset(-20, -20);
 
-        public CalendarCollectionViewLayout Layout;
+        public CalendarCollectionViewLayout Layout { private get; set; }
 
-        //In other words: 30 minutes or less
-        private bool shortCalendarItem => Frame.Height <= Layout.HourHeight / 2;
+        private bool shortCalendarItem => Frame.Height <= shortCalendarItemThreshold;
 
         private bool shouldCenterIconVertically => Frame.Height <= Layout.HourHeight / 4;
 

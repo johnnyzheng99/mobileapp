@@ -574,6 +574,7 @@
       <DependentUpon>SelectUserCalendarsFragment.cs</DependentUpon>
     </Compile>
     <Compile Include="Adapters\UserCalendarsRecyclerAdapter.cs" />
+    <Compile Include="ViewHolders\UserCalendarViewHolder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\AndroidManifest.xml" />
@@ -988,6 +989,7 @@
     <AndroidResource Include="Resources\layout\ReportsActivity.axml" />
     <AndroidResource Include="Resources\layout\MainActivity.axml" />
     <AndroidResource Include="Resources\layout\SelectUserCalendarsFragment.axml" />
+    <AndroidResource Include="Resources\layout\UserCalendarItem.axml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Toggl.Foundation\Toggl.Foundation.csproj">

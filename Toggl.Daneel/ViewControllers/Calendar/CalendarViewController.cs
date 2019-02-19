@@ -24,7 +24,6 @@ namespace Toggl.Daneel.ViewControllers
 
         private readonly UIImageView titleImage = new UIImageView(UIImage.FromBundle("togglLogo"));
         private readonly ITimeService timeService;
-        private readonly ISchedulerProvider schedulerProvider;
 
         private CalendarCollectionViewLayout layout;
         private CalendarCollectionViewSource dataSource;
@@ -38,7 +37,6 @@ namespace Toggl.Daneel.ViewControllers
             : base(nameof(CalendarViewController))
         {
             timeService = Mvx.Resolve<ITimeService>();
-            schedulerProvider = Mvx.Resolve<ISchedulerProvider>();
         }
 
         public override void ViewDidLoad()
@@ -83,7 +81,7 @@ namespace Toggl.Daneel.ViewControllers
                 ViewModel.TimeOfDayFormat,
                 ViewModel.CalendarItems);
 
-            layout = new CalendarCollectionViewLayout(timeService, dataSource, schedulerProvider);
+            layout = new CalendarCollectionViewLayout(timeService, dataSource);
 
             editItemHelper = new CalendarCollectionViewEditItemHelper(CalendarCollectionView, timeService, dataSource, layout);
             createFromSpanHelper = new CalendarCollectionViewCreateFromSpanHelper(CalendarCollectionView, dataSource, layout);

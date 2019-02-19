@@ -37,7 +37,6 @@ namespace Toggl.Daneel.Views.Calendar
         private DateTime date;
         private readonly ITimeService timeService;
         private readonly ICalendarCollectionViewLayoutDataSource dataSource;
-        private readonly ISchedulerProvider schedulerProvider;
 
         private readonly CompositeDisposable disposeBag = new CompositeDisposable();
 
@@ -61,17 +60,14 @@ namespace Toggl.Daneel.Views.Calendar
 
         public CalendarCollectionViewLayout(
             ITimeService timeService,
-            ICalendarCollectionViewLayoutDataSource dataSource,
-            ISchedulerProvider schedulerProvider)
+            ICalendarCollectionViewLayoutDataSource dataSource)
             : base()
         {
             Ensure.Argument.IsNotNull(timeService, nameof(timeService));
             Ensure.Argument.IsNotNull(dataSource, nameof(dataSource));
-            Ensure.Argument.IsNotNull(schedulerProvider, nameof(schedulerProvider));
 
             this.timeService = timeService;
             this.dataSource = dataSource;
-            this.schedulerProvider = schedulerProvider;
 
             date = timeService.CurrentDateTime.ToLocalTime().Date;
 
@@ -116,7 +112,6 @@ namespace Toggl.Daneel.Views.Calendar
             {
                 var offset = basePoint.Y - basePoint.Y * scale;
                 CollectionView.ContentOffset = new CGPoint(CollectionView.ContentOffset.X, CollectionView.ContentOffset.Y - offset);
-                Console.WriteLine(CollectionView.ContentOffset);
             }
 
             hourHeight = (float)Math.Max(minHourHeight, Math.Min(maxHourHeight, newHourHeight));

@@ -573,6 +573,7 @@
     <Compile Include="Fragments\SelectUserCalendarsFragment.ViewBinds.cs">
       <DependentUpon>SelectUserCalendarsFragment.cs</DependentUpon>
     </Compile>
+    <Compile Include="Adapters\UserCalendarsRecyclerAdapter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\AndroidManifest.xml" />

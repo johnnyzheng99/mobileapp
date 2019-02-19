@@ -15,6 +15,8 @@ namespace Toggl.Giskard.Fragments
             var view = inflater.Inflate(Resource.Layout.SelectUserCalendarsFragment, container, false);
             InitializeViews(view);
 
+            setupRecyclerView();
+
             cancelButton
                 .Rx()
                 .BindAction(ViewModel.Close)
@@ -26,6 +28,11 @@ namespace Toggl.Giskard.Fragments
                 .DisposedBy(DisposeBag);
 
             return view;
+        }
+
+        private void setupRecyclerView()
+        {
+
         }
     }
 }

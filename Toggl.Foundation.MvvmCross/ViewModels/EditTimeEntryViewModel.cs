@@ -21,8 +21,6 @@ using Toggl.Foundation.MvvmCross.Services;
 using Toggl.Multivac;
 using Toggl.Multivac.Extensions;
 using Toggl.PrimeRadiant.Settings;
-using static Toggl.Foundation.Helper.Constants;
-using SelectTimeOrigin = Toggl.Foundation.MvvmCross.Parameters.SelectTimeParameters.Origin;
 
 namespace Toggl.Foundation.MvvmCross.ViewModels
 {
@@ -101,22 +99,6 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         public TimeSpan Duration
             => (StopTime ?? timeService.CurrentDateTime) - StartTime;
 
-        public TimeSpan DisplayedDuration
-        {
-            get => Duration;
-            set
-            {
-                if (stopTime.HasValue)
-                {
-                    StopTime = StartTime + value;
-                }
-                else
-                {
-                    StartTime = timeService.CurrentDateTime - value;
-                }
-            }
-        }
-
         [DependsOn(nameof(IsTimeEntryRunning))]
         public DurationFormat DurationFormat => IsTimeEntryRunning ? DurationFormat.Improved : durationFormat;
 
@@ -178,15 +160,11 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         public IMvxCommand StopCommand { get; }
 
-        public IMvxAsyncCommand<SelectTimeOrigin> StopTimeEntryCommand { get; }
-
         public IMvxAsyncCommand DeleteCommand { get; }
 
         public IMvxAsyncCommand CloseCommand { get; }
 
         public IMvxAsyncCommand SelectDurationCommand { get; }
-
-        public IMvxAsyncCommand<SelectTimeOrigin> SelectTimeCommand { get; }
 
         public IMvxAsyncCommand SelectStartTimeCommand { get; }
 
@@ -236,13 +214,11 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             CloseCommand = new MvxAsyncCommand(CloseWithConfirmation);
 
             StopCommand = new MvxCommand(stopTimeEntry, () => IsTimeEntryRunning);
-            StopTimeEntryCommand = new MvxAsyncCommand<SelectTimeOrigin>(onStopTimeEntryCommand);
 
             SelectStartTimeCommand = new MvxAsyncCommand(selectStartTime, canExecute);
             SelectStopTimeCommand = new MvxAsyncCommand(selectStopTime, canExecute);
             SelectStartDateCommand = new MvxAsyncCommand(selectStartDate, canExecute);
             SelectDurationCommand = new MvxAsyncCommand(selectDuration, canExecute);
-            SelectTimeCommand = new MvxAsyncCommand<SelectTimeOrigin>(selectTime, _ => canExecute());
 
             SelectProjectCommand = new MvxAsyncCommand(selectProject);
             SelectTagsCommand = new MvxAsyncCommand(selectTags, canExecute);
@@ -431,57 +407,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             await editDuration(true);
         }
 
-        private async Task selectTime(SelectTimeOrigin origin)
-        {
-            var tapSource = getTapSourceFromSelectTimeOrigin(origin);
-            analyticsService.EditViewTapped.Track(tapSource);
-
-            var parameters = SelectTimeParameters
-                .CreateFromOrigin(origin, BeginningOfWeek, StartTime, StopTime)
-                .WithFormats(DateFormat, TimeFormat);
-
-            var data = await navigationService
-                .Navigate<SelectTimeViewModel, SelectTimeParameters, SelectTimeResultsParameters>(parameters)
-                .ConfigureAwait(false);
-
-            if (data == null)
-                return;
-
-            StartTime = data.Start;
-            StopTime = data.Stop;
-        }
-
-        private EditViewTapSource getTapSourceFromSelectTimeOrigin(SelectTimeOrigin origin)
-        {
-            switch (origin)
-            {
-                case SelectTimeOrigin.StartTime:
-                case SelectTimeOrigin.StartDate:
-                    return EditViewTapSource.StartTime;
-                case SelectTimeOrigin.StopTime:
-                case SelectTimeOrigin.StopDate:
-                    return EditViewTapSource.StopTime;
-                case SelectTimeOrigin.Duration:
-                    return EditViewTapSource.Duration;
-                default:
-                    throw new ArgumentException("Binding parameter is incorrect.");
-            }
-        }
-
         private void stopTimeEntry()
         {
             StopTime = timeService.CurrentDateTime;
-        }
-
-        private async Task onStopTimeEntryCommand(SelectTimeOrigin origin)
-        {
-            if (IsTimeEntryRunning)
-            {
-                StopTime = timeService.CurrentDateTime;
-                return;
-            }
-
-            await SelectTimeCommand.ExecuteAsync(origin);
         }
 
         private async Task selectProject()

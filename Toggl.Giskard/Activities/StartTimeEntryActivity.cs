@@ -16,7 +16,6 @@ using Toggl.Giskard.Extensions;
 using Toggl.Giskard.Extensions.Reactive;
 using Toggl.Giskard.Helper;
 using Toggl.Multivac.Extensions;
-using static Toggl.Foundation.MvvmCross.Parameters.SelectTimeParameters.Origin;
 
 namespace Toggl.Giskard.Activities
 {
@@ -48,7 +47,7 @@ namespace Toggl.Giskard.Activities
                 .DisposedBy(DisposeBag);
 
             durationLabel.Rx().Tap()
-                .Subscribe(_ => ViewModel.SelectTimeCommand.Execute(Duration))
+                .Subscribe(_ => ViewModel.ChangeTimeCommand.Execute())
                 .DisposedBy(DisposeBag);
 
             editText.TextObservable

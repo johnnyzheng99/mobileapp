@@ -578,6 +578,7 @@
     <Compile Include="ViewHolders\UserCalendarHeaderViewHolder.cs" />
     <Compile Include="Adapters\BaseSectionedRecyclerAdapter.cs" />
     <Compile Include="Extensions\Reactive\ButtonExtensions.cs" />
+    <Compile Include="Fragments\ReactiveDialogFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\AndroidManifest.xml" />

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reactive.Linq;
+using Android.Graphics;
 using Android.OS;
 using Android.Support.V7.Widget;
 using Android.Views;
@@ -12,8 +13,8 @@ using Toggl.Multivac.Extensions;
 
 namespace Toggl.Giskard.Fragments
 {
-    [MvxFragmentPresentation(AddToBackStack = true)]
-    public sealed partial class SelectUserCalendarsFragment : ReactiveFragment<SelectUserCalendarsViewModel>
+    [MvxDialogFragmentPresentation(AddToBackStack = true, Cancelable = false)]
+    public sealed partial class SelectUserCalendarsFragment : ReactiveDialogFragment<SelectUserCalendarsViewModel>
     {
         private UserCalendarsRecyclerAdapter userCalendarsAdapter;
 

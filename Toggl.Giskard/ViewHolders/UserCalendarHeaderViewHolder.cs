@@ -2,10 +2,11 @@
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
+using Toggl.Foundation.MvvmCross.ViewModels.Calendar;
 
 namespace Toggl.Giskard.ViewHolders
 {
-    public class UserCalendarHeaderViewHolder : BaseRecyclerViewHolder<string>
+    public class UserCalendarHeaderViewHolder : BaseRecyclerViewHolder<UserCalendarSourceViewModel>
     {
         private TextView sourceName;
 
@@ -29,8 +30,7 @@ namespace Toggl.Giskard.ViewHolders
 
         protected override void UpdateView()
         {
-            sourceName.Text = Item;
+            sourceName.Text = Item.Name;
         }
-
     }
 }

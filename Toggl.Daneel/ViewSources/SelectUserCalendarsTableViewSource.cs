@@ -4,12 +4,13 @@ using Foundation;
 using Toggl.Daneel.Cells;
 using Toggl.Daneel.Cells.Calendar;
 using Toggl.Foundation.MvvmCross.Collections;
+using Toggl.Foundation.MvvmCross.ViewModels.Calendar;
 using Toggl.Foundation.MvvmCross.ViewModels.Selectable;
 using UIKit;
 
 namespace Toggl.Daneel.ViewSources
 {
-    public sealed class SelectUserCalendarsTableViewSource : BaseTableViewSource<string, SelectableUserCalendarViewModel>
+    public sealed class SelectUserCalendarsTableViewSource : BaseTableViewSource<UserCalendarSourceViewModel, SelectableUserCalendarViewModel>
     {
         private const int rowHeight = 48;
         private const int headerHeight = 48;
@@ -17,7 +18,7 @@ namespace Toggl.Daneel.ViewSources
         public UIColor SectionHeaderBackgroundColor { get; set; } = UIColor.White;
 
         public SelectUserCalendarsTableViewSource(UITableView tableView)
-            : base(ImmutableList<CollectionSection<string, SelectableUserCalendarViewModel>>.Empty)
+            : base(ImmutableList<CollectionSection<UserCalendarSourceViewModel, SelectableUserCalendarViewModel>>.Empty)
         {
             tableView.RegisterNibForCellReuse(SelectableUserCalendarViewCell.Nib, SelectableUserCalendarViewCell.Identifier);
             tableView.RegisterNibForHeaderFooterViewReuse(UserCalendarListHeaderViewCell.Nib, UserCalendarListHeaderViewCell.Identifier);

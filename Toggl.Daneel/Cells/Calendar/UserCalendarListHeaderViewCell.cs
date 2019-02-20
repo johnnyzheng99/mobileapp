@@ -1,10 +1,11 @@
 ﻿using System;
 using Foundation;
+using Toggl.Foundation.MvvmCross.ViewModels.Calendar;
 using UIKit;
 
 namespace Toggl.Daneel.Cells.Calendar
 {
-    public sealed partial class UserCalendarListHeaderViewCell : BaseTableHeaderFooterView<string>
+    public sealed partial class UserCalendarListHeaderViewCell : BaseTableHeaderFooterView<UserCalendarSourceViewModel>
     {
         public static readonly string Identifier = nameof(UserCalendarListHeaderViewCell);
         public static readonly NSString Key = new NSString(nameof(UserCalendarListHeaderViewCell));
@@ -22,7 +23,7 @@ namespace Toggl.Daneel.Cells.Calendar
 
         protected override void UpdateView()
         {
-            TitleLabel.Text = Item;
+            TitleLabel.Text = Item.Name;
         }
     }
 }

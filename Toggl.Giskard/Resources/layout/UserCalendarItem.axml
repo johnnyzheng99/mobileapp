@@ -10,7 +10,8 @@
         android:id="@+id/Checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"/>
+        android:layout_marginLeft="16dp"
+        android:clickable="false"/>
     <TextView
         android:id="@+id/CalendarName"
         android:layout_width="wrap_content"

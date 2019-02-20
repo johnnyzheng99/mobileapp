@@ -35,5 +35,11 @@ namespace Toggl.Giskard.ViewHolders
             checkbox.Checked = Item.InitiallySelected;
             calendarName.Text = Item.Name;
         }
+
+        protected override void OnItemViewClick(object sender, EventArgs args)
+        {
+            base.OnItemViewClick(sender, args);
+            checkbox.Checked = !checkbox.Checked;
+        }
     }
 }

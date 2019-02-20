@@ -1,4 +1,7 @@
-﻿using Android.OS;
+﻿using System;
+using System.Linq;
+using System.Reactive.Linq;
+using Android.OS;
 using Android.Support.V7.Widget;
 using Android.Views;
 using MvvmCross.Platforms.Android.Presenters.Attributes;
@@ -31,6 +34,12 @@ namespace Toggl.Giskard.Fragments
             doneButton
                 .Rx()
                 .BindAction(ViewModel.Done)
+                .DisposedBy(DisposeBag);
+
+            ViewModel
+                .Calendars
+                .Select(calendars => calendars.ToList())
+                .Subscribe(userCalendarsAdapter.Rx().Items())
                 .DisposedBy(DisposeBag);
 
             userCalendarsAdapter

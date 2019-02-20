@@ -576,6 +576,7 @@
     <Compile Include="Adapters\UserCalendarsRecyclerAdapter.cs" />
     <Compile Include="ViewHolders\UserCalendarViewHolder.cs" />
     <Compile Include="ViewHolders\UserCalendarHeaderViewHolder.cs" />
+    <Compile Include="Adapters\BaseSectionedRecyclerAdapter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\AndroidManifest.xml" />

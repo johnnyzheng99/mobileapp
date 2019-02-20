@@ -577,6 +577,7 @@
     <Compile Include="ViewHolders\UserCalendarViewHolder.cs" />
     <Compile Include="ViewHolders\UserCalendarHeaderViewHolder.cs" />
     <Compile Include="Adapters\BaseSectionedRecyclerAdapter.cs" />
+    <Compile Include="Extensions\Reactive\ButtonExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\AndroidManifest.xml" />
@@ -993,6 +994,7 @@
     <AndroidResource Include="Resources\layout\SelectUserCalendarsFragment.axml" />
     <AndroidResource Include="Resources\layout\UserCalendarItem.axml" />
     <AndroidResource Include="Resources\layout\UserCalendarHeader.axml" />
+    <AndroidResource Include="Resources\color\BlueLinkTextColor.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Toggl.Foundation\Toggl.Foundation.csproj">

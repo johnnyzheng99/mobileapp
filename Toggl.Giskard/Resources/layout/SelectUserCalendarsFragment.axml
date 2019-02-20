@@ -101,7 +101,7 @@
                 android:textSize="14sp"
                 android:fontFamily="sans-serif-medium"
                 android:textStyle="normal"
-                android:textColor="@color/buttonBlue"
+                android:textColor="@color/bluelinktextcolor"
                 android:letterSpacing="0.04"
                 android:lineSpacingExtra="2sp"
                 android:textAllCaps="false"

@@ -114,6 +114,31 @@ namespace Toggl.Tests.UI
         }
 
         [Test]
+        public void CreatingATimeEntryWithAnExistingClientWorks()
+        {
+            const string description = "Field Research ";
+
+            var projectName = "Meme Production";
+            var clientName = "The World Wide Web";
+            app.EnterText(description);
+
+            app.EnterText($"@{projectName}");
+            app.TapCreateProject(projectName);
+            app.Tap(NewProject.ChangeClient);
+            app.EnterText(clientName);
+            app.TapCreateClient(clientName);
+
+            app.WaitForElement(NewProject.CloseButton);
+            app.Tap(NewProject.CloseButton);
+
+            app.WaitForElement(NewProject.ChangeClient);
+            app.Tap(NewProject.ChangeClient);
+
+            app.EnterText(clientName);
+            app.TapSelectClient(clientName);
+        }
+
+        [Test]
         public void CreatingATimeEntryWithASingleTagWorks()
         {
             const string description = "Working from home ";

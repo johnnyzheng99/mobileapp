@@ -128,14 +128,22 @@ namespace Toggl.Tests.UI
             app.EnterText(clientName);
             app.TapCreateClient(clientName);
 
-            app.WaitForElement(NewProject.CloseButton);
-            app.Tap(NewProject.CloseButton);
-
-            app.WaitForElement(NewProject.ChangeClient);
+            app.CloseSelectProjectDialog();
+            app.TapCreateProject(projectName);
             app.Tap(NewProject.ChangeClient);
-
             app.EnterText(clientName);
+
             app.TapSelectClient(clientName);
+
+            app.WaitForElement(NewProject.CreateButton);
+            app.Tap(NewProject.CreateButton);
+
+            app.Tap(StartTimeEntry.DoneButton);
+            app.Tap(Main.StopTimeEntryButton);
+
+            app.PullToRefresh();
+
+            app.WaitForElement(clientName);
         }
 
         [Test]

@@ -33,5 +33,11 @@ namespace Toggl.Tests.UI.Extensions
         {
             app.TapNthCellInCollection(0);
         }
+
+        public static void CloseSelectProjectDialog(this IApp app)
+        {
+            app.WaitForElement(NewProject.CloseButton);
+            app.Tap(NewProject.CloseButton);
+        }
     }
 }

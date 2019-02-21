@@ -37,6 +37,11 @@ namespace Toggl.Tests.UI.Extensions
             tapAndWaitForElement(app, clientName);
         }
 
+        public static void CloseSelectProjectDialog(this IApp app)
+        {
+            //TODO: Implement me
+        }
+
         private static void tapAndWaitForElement(IApp app, string query)
         {
             app.WaitForElement(query);

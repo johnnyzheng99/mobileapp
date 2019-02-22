@@ -27,7 +27,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels.Selectable
 
         public bool Equals(SelectableUserCalendarViewModel other)
         {
-            throw new System.NotImplementedException();
+            return Id == other.Id;
         }
     }
 }
